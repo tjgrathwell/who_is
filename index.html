@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Who is?</title>
+  <link rel="stylesheet" href="who_is.css">
+  <script id="person-template" type="text/x-handlebars-template">
+    <div class="person">
+      <h3>Who is this?</h3>
+      <img class="photo" src="{{photo}}" />
+
+      <div class="answer">
+        {{#if hard}}
+        <input placeholder="{{name}}" style="width: 100%;"/>
+        {{else}}
+        {{#each choices}}
+        <button class="choice">{{name}}</button>
+        {{/each}}
+        {{/if}}
+      </div>
+    </div>
+  </script>
+  <script id="previous-template" type="text/x-handlebars-template">
+    <h1 style="text-align: center;">{{#if yes_or_no}}YES{{else}}NO{{/if}}</h1>
+    <img class="photo" src="{{photo}}"/>
+
+    <h3>That was {{name}}</h3>
+  </script>
+</head>
+<body>
+
+<h1>Who is?</h1>
+
+<div class="game hidden">
+  <table>
+    <tr>
+      <td>
+        <div id="question"></div>
+      </td>
+      <td>
+        <div id="answer"></div>
+      </td>
+    </tr>
+  </table>
+
+  <h2>Your Score: <span id="score"></span> right, <span id="incorrect"></span> wrong</h2>
+
+  <h2>(<span id="percentage"></span>%, <span id="total"></span> left)</h2>
+</div>
+
+<div class="entry">
+  Enter a series of image URLs and Names, in the following format
+  <pre>
+    http://fillmurray.com/200/200 Ghost Buster
+    http://placekitten.com/200/200 Kitty Cat
+    http://placecage.com/200/200 Ghost Rider
+  </pre>
+  <textarea></textarea>
+  <button>Begin!</button>
+</div>
+
+<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
+<script src="https://raw.github.com/wycats/handlebars.js/1.0.0-rc.3/dist/handlebars.js"></script>
+<script src="who_is.js"></script>
+
+</body>
+</html>
