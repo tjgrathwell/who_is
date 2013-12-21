@@ -21,7 +21,6 @@ function currentPerson() {
 
 function addPerson(personIndex) {
   currentPersonIndex = personIndex;
-  var templateData = currentPerson();
   renderPerson($('#question'), addChoices(currentPerson(), personIndex));
 }
 
