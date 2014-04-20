@@ -12,11 +12,7 @@ var guesses = 0;
 var currentPersonIndex;
 
 function currentPerson() {
-  var person = currentPeople[currentPersonIndex];
-  return {
-    name: person[1],
-    photo: person[0]
-  }
+  return currentPeople[currentPersonIndex];
 }
 
 function addPerson(personIndex) {
@@ -24,38 +20,33 @@ function addPerson(personIndex) {
   renderPerson($('#question'), addChoices(currentPerson(), personIndex));
 }
 
-function addChoices (person, personIndex) {
-  var numChoices = 6;
+function randInt (max) {
+  return Math.floor(Math.random() * max);
+}
+
+function addChoices (person) {
+  function randomChoice(exceptionNames) {
+    var personIx = randInt(allPeople.length);
+    var randomPerson = allPeople[personIx];
+    while (_.include(exceptionNames, randomPerson.name)) {
+      personIx = randInt(allPeople.length);
+      randomPerson = allPeople[personIx];
+    }
+    return randomPerson;
+  }
+
+  var numChoices = Math.min(allPeople.length, 6);
   var choices = [];
-  var personChoiceIndex = Math.floor(Math.random() * numChoices);
-  while (choices.length < 6) {
-    if (choices.length === personChoiceIndex) {
-      choices.push({name: currentPeople[personIndex][1]});
-    } else {
-      addToChoices(choices);
-    }
+  while (choices.length < numChoices - 1) {
+    var exceptionNames = choices.concat(person.name);
+    choices.push(randomChoice(exceptionNames).name);
   }
-  person.choices = choices;
+
+  choices.splice(randInt(numChoices), 0, person.name);
+  person.choices = _.map(choices, function (choiceName) {
+    return {name: choiceName};
+  });
   return person;
-}
-
-function inArray(person, people) {
-  for (var i = 0; i < people.length; i++) {
-    if (person[1] === people[i][1]) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function addToChoices(choices) {
-  var personIx = Math.floor(Math.random() * allPeople.length);
-  var randomPerson = allPeople[personIx];
-  while (inArray(randomPerson, choices)) {
-    personIx = Math.floor(Math.random() * allPeople.length);
-    randomPerson = allPeople[personIx];
-  }
-  choices.push({name: randomPerson[1]});
 }
 
 function renderPerson($el, person) {
@@ -69,7 +60,7 @@ function renderPrevious($el, person) {
 }
 
 function addRandomPerson() {
-  var personIx = Math.floor(Math.random() * currentPeople.length);
+  var personIx = randInt(currentPeople.length);
   addPerson(personIx);
   $('.answer input').focus();
 }
@@ -138,17 +129,21 @@ function strip(str) {
   return str.replace(/^\s*(.*?)\s*$/, "$1");
 }
 
+function parseTextarea () {
+  return _.compact(_.map($('.entry textarea').val().split("\n"), function (line) {
+    var match;
+    if (match = strip(line).match(/^(http[^ ]+)\s+(.*)/)) {
+      return {
+        photo: match[1],
+        name: match[2]
+      };
+    }
+  }));
+}
+
 $(document).ready(function () {
   $(document).on('click', '.entry button', function (event) {
-    allPeople = [];
-    var match;
-    var lines = $('.entry textarea').val().split("\n");
-    for (var i = 0; i < lines.length; i++) {
-      var line = strip(lines[i]);
-      if (match = line.match(/^(http[^ ]+)\s+(.*)/)) {
-        allPeople.push([match[1], match[2]]);
-      }
-    }
+    allPeople = parseTextarea();
 
     $('.entry').addClass('hidden');
     $('.game').removeClass('hidden');
