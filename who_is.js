@@ -1,3 +1,4 @@
+var score, wrong, guesses, currentPersonIndex;
 var allPeople = [];
 var currentPeople = [];
 
@@ -5,11 +6,6 @@ var templates = {
   person: Handlebars.compile($("#person-template").html()),
   previous: Handlebars.compile($("#previous-template").html())
 };
-
-var score = 0;
-var wrong = 0;
-var guesses = 0;
-var currentPersonIndex;
 
 function currentPerson() {
   return currentPeople[currentPersonIndex];
@@ -88,10 +84,8 @@ function renderScore() {
 function processGuess(guess) {
   var thisPerson = currentPerson();
 
-  thisPerson.yes_or_no = false;
   guesses += 1;
   if (fullMatch(guess)) {
-    thisPerson.yes_or_no = true;
     currentPeople.splice(currentPersonIndex, 1);
     score += 1;
   } else if (partialCredit(guess)) {
@@ -101,28 +95,30 @@ function processGuess(guess) {
   }
 
   renderScore();
-  addRandomPerson();
-  renderPrevious($('#answer'), thisPerson);
+
+  if (currentPeople.length > 0) {
+    addRandomPerson();
+    renderPrevious($('#answer'), thisPerson);
+  } else {
+    $('.restart').removeClass('hidden');
+  }
 }
 
 function startGuessing() {
+  $('.entry').addClass('hidden');
+  $('.game').removeClass('hidden');
+  $('.restart').addClass('hidden');
+  $('#answer').addClass('hidden');
+
+  score = 0;
+  wrong = 0;
+  guesses = 0;
+
   currentPeople = allPeople.slice(0);
 
   addRandomPerson();
 
   renderScore();
-
-  $(document).on('click', 'button.choice', function (event) {
-    var guess = $(this).text();
-    processGuess(guess);
-  });
-
-  $(document).on('keydown', '.answer input', function (event) {
-    if (event.which === 13) {
-      var guess = $('.answer input').val();
-      processGuess(guess);
-    }
-  });
 }
 
 function strip(str) {
@@ -145,9 +141,22 @@ $(document).ready(function () {
   $(document).on('click', '.entry button', function (event) {
     allPeople = parseTextarea();
 
-    $('.entry').addClass('hidden');
-    $('.game').removeClass('hidden');
+    startGuessing();
+  });
 
+  $(document).on('click', 'button.choice', function (event) {
+    var guess = $(this).text();
+    processGuess(guess);
+  });
+
+  $(document).on('keydown', '.answer input', function (event) {
+    if (event.which === 13) {
+      var guess = $('.answer input').val();
+      processGuess(guess);
+    }
+  });
+
+  $(document).on('click', '.restart button', function (event) {
     startGuessing();
   });
 });
