@@ -53,6 +53,7 @@ function renderPerson($el, person) {
 function renderPrevious($el, person) {
   $el.empty();
   $el.append(templates.previous(person));
+  $el.removeClass('hidden');
 }
 
 function addRandomPerson() {
@@ -85,7 +86,9 @@ function processGuess(guess) {
   var thisPerson = currentPerson();
 
   guesses += 1;
+  thisPerson.yes_or_no = false;
   if (fullMatch(guess)) {
+    thisPerson.yes_or_no = true;
     currentPeople.splice(currentPersonIndex, 1);
     score += 1;
   } else if (partialCredit(guess)) {
