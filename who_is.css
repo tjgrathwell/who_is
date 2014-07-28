@@ -49,3 +49,20 @@ img.photo {
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
 }
+
+.container > h1 {
+  text-align: center;
+  margin: 25px auto;
+}
+
+.game > .row {
+  display: flex;
+}
+
+.scores {
+  margin: 10px auto;
+}
+
+.game h2, .restart, .replay {
+  text-align: center;
+}

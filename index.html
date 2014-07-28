@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Who is?</title>
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.css">
   <link rel="stylesheet" href="who_is.css">
   <script id="person-template" type="text/x-handlebars-template">
     <div class="person">
@@ -29,45 +30,46 @@
 </head>
 <body>
 
-<h1>Who is?</h1>
+<div class="container">
+  <h1>Who is?</h1>
 
-<div class="game hidden">
-  <table>
-    <tr>
-      <td>
-        <div id="question"></div>
-      </td>
-      <td>
-        <div id="answer"></div>
-      </td>
-    </tr>
-  </table>
+  <div class="game hidden">
+    <div class="row">
+      <div id="question" class="col-md-4 col-md-offset-2"></div>
+      <div id="answer" class="col-md-4"></div>
+    </div>
 
-  <h2>Your Score: <span id="score"></span> correct, <span id="incorrect"></span> incorrect</h2>
+    <div class="row">
+      <div class="col-md-12 scores">
+        <h2>Your Score: <span id="score"></span> correct, <span id="incorrect"></span> incorrect</h2>
 
-  <h2>(<span id="percentage"></span>%, <span id="total"></span> remain)</h2>
+        <h2>(<span id="percentage"></span>%, <span id="total"></span> remain)</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="entry">
+    Enter a series of image URLs and Names, in the following format
+    <pre>
+      http://fillmurray.com/200/200 Ghost Buster
+      http://placekitten.com/200/200 Kitty Cat
+      http://placecage.com/200/200 Ghost Rider
+    </pre>
+    <textarea></textarea>
+    <button>Begin!</button>
+  </div>
+
+  <div class="replay hidden">
+    <h1>GAME COMPLETE</h1>
+    <button>Replay?</button>
+  </div>
+
+  <div class="restart hidden">
+    <button>Restart with a new set of names?</button>
+  </div>
 </div>
 
-<div class="entry">
-  Enter a series of image URLs and Names, in the following format
-  <pre>
-    http://fillmurray.com/200/200 Ghost Buster
-    http://placekitten.com/200/200 Kitty Cat
-    http://placecage.com/200/200 Ghost Rider
-  </pre>
-  <textarea></textarea>
-  <button>Begin!</button>
-</div>
-
-<div class="replay hidden">
-  <h1>GAME COMPLETE</h1>
-  <button>Replay?</button>
-</div>
-
-<div class="restart hidden">
-  <button>Restart with a new set of names?</button>
-</div>
-
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
