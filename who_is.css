@@ -7,7 +7,6 @@
 }
 
 .person {
-  width: 320px;
   text-align: center;
   margin: 0 auto;
 }
@@ -23,6 +22,11 @@ img.photo {
 
 .entry {
   width: 800px;
+  margin: 0 auto;
+}
+
+.entry pre {
+  white-space: pre-line;
 }
 
 .entry textarea {
@@ -44,6 +48,9 @@ img.photo {
 
 .choice {
   width: 49%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -53,10 +60,6 @@ h1, h2, h3, h4, h5, h6 {
 .container > h1 {
   text-align: center;
   margin: 25px auto;
-}
-
-.game > .row {
-  display: flex;
 }
 
 .scores {
