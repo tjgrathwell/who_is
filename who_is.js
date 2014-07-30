@@ -78,6 +78,14 @@ function partialCredit(guess) {
   return guess.toLowerCase().split(' ')[0] === currentPerson().name.toLowerCase().split(' ')[0];
 }
 
+function renderFailure(person) {
+  $('.failures').removeClass('hidden');
+  var img = $('<img></img>');
+  img.attr('src', person.photo);
+  img.attr('title', person.name);
+  $('.failures .photos').append(img);
+}
+
 function renderScore() {
   $('#total').text(currentPeople.length);
   $('#score').text(score);
@@ -103,6 +111,7 @@ function processGuess(guess) {
     score += .5;
   } else {
     wrong += 1;
+    renderFailure(thisPerson);
   }
 
   renderScore();
@@ -121,6 +130,8 @@ function setGameVisibility(playing) {
   $('.restart').toggleClass('hidden', !playing);
   $('#answer').toggleClass('hidden', !playing);
   $('.replay').addClass('hidden');
+  $('.failures').addClass('hidden');
+  $('.failures .photos').empty();
 }
 
 function startGuessing() {
