@@ -22,7 +22,7 @@
     </div>
   </script>
   <script id="previous-template" type="text/x-handlebars-template">
-    <h1 style="text-align: center;">{{#if yes_or_no}}YES{{else}}NO{{/if}}</h1>
+    <h1 style="text-align: center;">{{#if guessedCorrectly}}YES{{else}}NO{{/if}}</h1>
     <img class="photo" src="{{photo}}"/>
 
     <h3>That was {{name}}</h3>
@@ -55,10 +55,9 @@
   <div class="entry">
     Enter a series of image URLs and Names, in the following format
     <pre>
-      http://fillmurray.com/200/200 Ghost Buster
-      http://placekitten.com/200/200 Kitty Cat
-      http://placecage.com/200/200 Ghost Rider
-    </pre>
+http://fillmurray.com/200/200 Ghost Buster
+http://placekitten.com/200/200 Kitty Cat
+http://placecage.com/200/200 Ghost Rider</pre>
     <textarea></textarea>
     <button>Begin!</button>
   </div>

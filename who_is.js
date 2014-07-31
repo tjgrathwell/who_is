@@ -62,6 +62,8 @@ function renderPrevious($el, person) {
   $el.empty();
   $el.append(templates.previous(person));
   $el.removeClass('hidden');
+  $el.toggleClass('success', person.guessedCorrectly);
+  $el.toggleClass('failure', !person.guessedCorrectly);
 }
 
 function addRandomPerson() {
@@ -102,9 +104,9 @@ function processGuess(guess) {
   var thisPerson = currentPerson();
 
   guesses += 1;
-  thisPerson.yes_or_no = false;
+  thisPerson.guessedCorrectly = false;
   if (fullMatch(guess)) {
-    thisPerson.yes_or_no = true;
+    thisPerson.guessedCorrectly = true;
     currentPeople.splice(currentPersonIndex, 1);
     score += 1;
   } else if (partialCredit(guess)) {
