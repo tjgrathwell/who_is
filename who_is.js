@@ -58,12 +58,15 @@ function renderPerson($el, person) {
   $el.append(templates.person(person));
 }
 
-function renderPrevious($el, person) {
+function renderPrevious($el, answerPerson, guessedPerson) {
   $el.empty();
-  $el.append(templates.previous(person));
+  $el.append(templates.previous({
+    answerPerson: answerPerson,
+    guessedPerson: guessedPerson
+  }));
   $el.removeClass('hidden');
-  $el.toggleClass('success', person.guessedCorrectly);
-  $el.toggleClass('failure', !person.guessedCorrectly);
+  $el.toggleClass('success', answerPerson.guessedCorrectly);
+  $el.toggleClass('failure', !answerPerson.guessedCorrectly);
 }
 
 function addRandomPerson() {
@@ -120,7 +123,8 @@ function processGuess(guess) {
 
   if (currentPeople.length > 0) {
     addRandomPerson();
-    renderPrevious($('#answer'), thisPerson);
+    var guessedPerson = allPeople.filter(function (person) { return person.name == guess; })[0];
+    renderPrevious($('#answer'), thisPerson, guessedPerson);
   } else {
     $('.replay').removeClass('hidden');
   }

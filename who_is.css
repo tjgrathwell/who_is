@@ -45,6 +45,10 @@ img.photo {
 #answer.failure {
   border-color: rgb(255, 150, 150);
 }
+#answer.failure img {
+  width: 75px;
+  height: 75px;
+}
 
 .answers {
   font-size: 0;
