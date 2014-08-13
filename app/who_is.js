@@ -1,4 +1,4 @@
-var score, wrong, guesses, currentPersonIndex;
+var score, wrong, guesses, currentPersonIndex, difficulty;
 var allPeople = [];
 var currentPeople = [];
 
@@ -21,7 +21,19 @@ function currentPerson() {
 
 function addPerson(personIndex) {
   currentPersonIndex = personIndex;
-  renderPerson($('#question'), addChoices(currentPerson(), personIndex));
+  var personToRender = addChoices(currentPerson(), personIndex);
+  personToRender.easy = difficulty == 'easy';
+  personToRender.medium = difficulty == 'medium';
+  renderPerson($('#question'), personToRender);
+  $('.typeahead').typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 1
+  }, {
+    name: 'people',
+    displayKey: 'value',
+    source: substringMatcher(allPeople.map(function (person) { return person.name; }))
+  });
 }
 
 function randInt (max) {
@@ -170,7 +182,38 @@ function parseTextarea () {
   }));
 }
 
+// Ripped from the example at http://twitter.github.io/typeahead.js/examples/
+var substringMatcher = function(strs) {
+  return function findMatches(q, cb) {
+    var matches, substrRegex;
+
+    // an array that will be populated with substring matches
+    matches = [];
+
+    // regex used to determine if a string contains the substring `q`
+    substrRegex = new RegExp(q, 'i');
+
+    // iterate through the pool of strings and for any string that
+    // contains the substring `q`, add it to the `matches` array
+    $.each(strs, function(i, str) {
+      if (substrRegex.test(str)) {
+        // the typeahead jQuery plugin expects suggestions to a
+        // JavaScript object, refer to typeahead docs for more info
+        matches.push({ value: str });
+      }
+    });
+
+    cb(matches);
+  };
+};
+
 $(document).ready(function () {
+  difficulty = 'easy';
+  if (window.supportsLocalStorage) {
+    difficulty = localStorage['who_is.difficulty'] || difficulty;
+    $('select.difficulty').val(difficulty);
+  }
+
   $(document).on('click', '.entry button', function (event) {
     allPeople = parseTextarea();
     if (window.supportsLocalStorage) {
@@ -180,8 +223,26 @@ $(document).ready(function () {
     startGuessing();
   });
 
+  $(document).on('change', 'select.difficulty', function () {
+    difficulty = $('select.difficulty').val();
+    if (window.supportsLocalStorage) {
+      localStorage['who_is.difficulty'] = difficulty;
+    }
+    startGuessing();
+  });
+
   $(document).on('click', '.replay button', function (event) {
     startGuessing();
+  });
+
+  $(document).on('keyup', '.answer .typeahead', function (event) {
+    if (event.which === 13) {
+      var guess = $(this).val();
+      if (allPeople.filter(function (person) { return person.name === guess; }).length > 0) {
+
+        processGuess(guess);
+      }
+    }
   });
 
   $(document).on('click', '.restart button', function (event) {
@@ -191,13 +252,6 @@ $(document).ready(function () {
   $(document).on('click', 'button.choice', function (event) {
     var guess = $(this).text();
     processGuess(guess);
-  });
-
-  $(document).on('keydown', '.answer input', function (event) {
-    if (event.which === 13) {
-      var guess = $('.answer input').val();
-      processGuess(guess);
-    }
   });
 
   if (window.supportsLocalStorage && localStorage['who_is.people']) {
