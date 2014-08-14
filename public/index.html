@@ -11,13 +11,16 @@
       <img class="photo" src="{{photo}}" />
 
       <div class="answer">
-        {{#if easy}}
+        {{#if difficulty.easy}}
           {{#each choices}}
           <button class="choice">{{name}}</button>
           {{/each}}
         {{/if}}
-        {{#if medium}}
+        {{#if difficulty.medium}}
           <input class="typeahead" placeholder="Who is it?" autofocus>
+        {{/if}}
+        {{#if difficulty.hard}}
+          <input class='form-control' placeholder="Who is it?" autofocus>
         {{/if}}
       </div>
     </div>
@@ -27,9 +30,11 @@
     <img class="photo" src="{{answerPerson.photo}}"/>
     <h3>That was {{answerPerson.name}}</h3>
     {{#unless answerPerson.guessedCorrectly}}
-      <br>
-      <h3>This is {{guessedPerson.name}}:</h3>
-      <img class="photo" src="{{guessedPerson.photo}}"/>
+      {{#if guessedPerson}}
+        <br>
+        <h3>This is {{guessedPerson.name}}:</h3>
+        <img class="photo" src="{{guessedPerson.photo}}"/>
+      {{/if}}
     {{/unless}}
 
   </script>
@@ -77,6 +82,7 @@ http://placecage.com/200/200 Ghost Rider</pre>
         <select class="difficulty pull-right form-control">
           <option value="easy">Easy</option>
           <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
         </select>
       </div>
     </div>

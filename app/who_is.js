@@ -22,8 +22,8 @@ function currentPerson() {
 function addPerson(personIndex) {
   currentPersonIndex = personIndex;
   var personToRender = addChoices(currentPerson(), personIndex);
-  personToRender.easy = difficulty == 'easy';
-  personToRender.medium = difficulty == 'medium';
+  personToRender.difficulty = {};
+  personToRender.difficulty[difficulty] = true;
   renderPerson($('#question'), personToRender);
   $('.typeahead').typeahead({
     hint: true,
@@ -235,11 +235,11 @@ $(document).ready(function () {
     startGuessing();
   });
 
-  $(document).on('keyup', '.answer .typeahead', function (event) {
+  $(document).on('keyup', '.answer input', function (event) {
     if (event.which === 13) {
       var guess = $(this).val();
-      if (allPeople.filter(function (person) { return person.name === guess; }).length > 0) {
-
+      var validPerson = allPeople.filter(function (person) { return person.name === guess; }).length > 0;
+      if (difficulty == 'hard' || (difficulty == 'medium' && validPerson)) {
         processGuess(guess);
       }
     }
