@@ -28,6 +28,7 @@ function addPerson(personIndex) {
   $('.typeahead').typeahead({
     hint: true,
     highlight: true,
+    autoselect: true,
     minLength: 1
   }, {
     name: 'people',
@@ -146,18 +147,22 @@ function setGameVisibility(playing) {
   $('.entry').toggleClass('hidden', playing);
   $('.game').toggleClass('hidden', !playing);
   $('.restart').toggleClass('hidden', !playing);
-  $('#answer').toggleClass('hidden', !playing);
+  $('#answer')
+    .empty()
+    .removeClass('success')
+    .removeClass('failure')
+    .toggleClass('hidden', !playing || (guesses === 0));
   $('.replay').addClass('hidden');
   $('.failures').addClass('hidden');
   $('.failures .photos').empty();
 }
 
 function startGuessing() {
-  setGameVisibility(true);
-
   score = 0;
   wrong = 0;
   guesses = 0;
+
+  setGameVisibility(true);
 
   currentPeople = allPeople.slice(0);
 
