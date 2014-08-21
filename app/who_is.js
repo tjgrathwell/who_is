@@ -7,13 +7,30 @@ var templates = {
   previous: Handlebars.compile($("#previous-template").html())
 };
 
-window.supportsLocalStorage = (function () {
-  try {
-    return 'localStorage' in window && window['localStorage'] !== null;
-  } catch (e) {
-    return false;
-  }
-}());
+var storage = {
+  retrieve: function (key, callback, defaultValue) {
+    if (this.supported) {
+      var value = localStorage['who_is.' + key];
+      if (value) {
+        callback(value);
+      }
+    } else if (defaultValue) {
+      callback(defaultValue);
+    }
+  },
+  store: function (key, value) {
+    if (this.supported) {
+      localStorage['who_is.' + key] = value;
+    }
+  },
+  supported: (function () {
+    try {
+      return 'localStorage' in window && window['localStorage'] !== null;
+    } catch (e) {
+      return false;
+    }
+  }())
+};
 
 function currentPerson() {
   return currentPeople[currentPersonIndex];
@@ -213,26 +230,22 @@ var substringMatcher = function(strs) {
 };
 
 $(document).ready(function () {
-  difficulty = 'easy';
-  if (window.supportsLocalStorage) {
-    difficulty = localStorage['who_is.difficulty'] || difficulty;
-    $('select.difficulty').val(difficulty);
-  }
+  storage.retrieve('difficulty', function (value) {
+    difficulty = value;
+  }, 'easy');
+  $('select.difficulty').val(difficulty);
 
   $(document).on('click', '.entry button', function (event) {
     allPeople = parseTextarea();
-    if (window.supportsLocalStorage) {
-      localStorage['who_is.people'] = JSON.stringify(allPeople);
-    }
+    storage.store('who_is.people', JSON.stringify(allPeople));
 
     startGuessing();
   });
 
   $(document).on('change', 'select.difficulty', function () {
     difficulty = $('select.difficulty').val();
-    if (window.supportsLocalStorage) {
-      localStorage['who_is.difficulty'] = difficulty;
-    }
+    storage.store('difficulty', difficulty);
+
     startGuessing();
   });
 
@@ -259,8 +272,8 @@ $(document).ready(function () {
     processGuess(guess);
   });
 
-  if (window.supportsLocalStorage && localStorage['who_is.people']) {
-    allPeople = JSON.parse(localStorage['who_is.people']);
+  storage.retrieve('people', function (people) {
+    allPeople = JSON.parse(people);
     startGuessing();
-  }
+  });
 });
