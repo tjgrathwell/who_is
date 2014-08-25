@@ -1,4 +1,20 @@
-var score, wrong, guesses, currentPersonIndex, difficulty;
+var game = {
+  playing: false,
+  score: 0,
+  score: 0,
+  wrong: 0,
+  guesses: 0,
+  difficulty: 'easy',
+  percentage: function () {
+    if (this.score === this.guesses) {
+      return 100;
+    } else {
+      var pct = (this.score / this.guesses) * 100;
+      pct.toString().substr(0, 2);
+    }
+  }
+};
+var currentPersonIndex;
 var allPeople = [];
 var currentPeople = [];
 
@@ -40,7 +56,7 @@ function addPerson(personIndex) {
   currentPersonIndex = personIndex;
   var personToRender = addChoices(currentPerson(), personIndex);
   personToRender.difficulty = {};
-  personToRender.difficulty[difficulty] = true;
+  personToRender.difficulty[game.difficulty] = true;
   renderPerson($('#question'), personToRender);
   $('.typeahead').typeahead({
     hint: true,
@@ -123,29 +139,24 @@ function renderFailure(person) {
 
 function renderScore() {
   $('#total').text(currentPeople.length);
-  $('#score').text(score);
-  $('#incorrect').text(wrong);
-  if (score === guesses) {
-    $('#percentage').text(100);
-  } else {
-    var pct = (score / guesses) * 100;
-    $('#percentage').text(pct.toString().substr(0, 2));
-  }
+  $('#score').text(game.score);
+  $('#incorrect').text(game.wrong);
+  $('#percentage').text(game.percentage());
 }
 
 function processGuess(guess) {
   var thisPerson = currentPerson();
 
-  guesses += 1;
+  game.guesses += 1;
   thisPerson.guessedCorrectly = false;
   if (fullMatch(guess)) {
     thisPerson.guessedCorrectly = true;
     currentPeople.splice(currentPersonIndex, 1);
-    score += 1;
+    game.score += 1;
   } else if (partialCredit(guess)) {
-    score += .5;
+    game.score += .5;
   } else {
-    wrong += 1;
+    game.wrong += 1;
     renderFailure(thisPerson);
   }
 
@@ -161,6 +172,7 @@ function processGuess(guess) {
 }
 
 function setGameVisibility(playing) {
+  game.playing = playing;
   $('.entry').toggleClass('hidden', playing);
   $('.game').toggleClass('hidden', !playing);
   $('.restart').toggleClass('hidden', !playing);
@@ -168,16 +180,16 @@ function setGameVisibility(playing) {
     .empty()
     .removeClass('success')
     .removeClass('failure')
-    .toggleClass('hidden', !playing || (guesses === 0));
+    .toggleClass('hidden', !playing || (game.guesses === 0));
   $('.replay').addClass('hidden');
   $('.failures').addClass('hidden');
   $('.failures .photos').empty();
 }
 
 function startGuessing() {
-  score = 0;
-  wrong = 0;
-  guesses = 0;
+  game.score = 0;
+  game.wrong = 0;
+  game.guesses = 0;
 
   setGameVisibility(true);
 
@@ -231,9 +243,9 @@ var substringMatcher = function(strs) {
 
 $(document).ready(function () {
   storage.retrieve('difficulty', function (value) {
-    difficulty = value;
+    game.difficulty = value;
   }, 'easy');
-  $('select.difficulty').val(difficulty);
+  $('select.difficulty').val(game.difficulty);
 
   $(document).on('click', '.entry button', function (event) {
     allPeople = parseTextarea();
@@ -243,8 +255,8 @@ $(document).ready(function () {
   });
 
   $(document).on('change', 'select.difficulty', function () {
-    difficulty = $('select.difficulty').val();
-    storage.store('difficulty', difficulty);
+    game.difficulty = $('select.difficulty').val();
+    storage.store('difficulty', game.difficulty);
 
     startGuessing();
   });
@@ -253,11 +265,47 @@ $(document).ready(function () {
     startGuessing();
   });
 
+  var keys = {
+    W: 87,
+    A: 65,
+    S: 83,
+    UP: 38,
+    RIGHT: 39,
+    DOWN: 40
+  };
+
+  //  0/W    1/^
+  //  2/A    3/>
+  //  4/S    5/v
+
+  var key_choices = {};
+  key_choices[keys.W] = 0;
+  key_choices[keys.A] = 2;
+  key_choices[keys.S] = 4;
+  key_choices[keys.UP] = 1;
+  key_choices[keys.RIGHT] = 3;
+  key_choices[keys.DOWN] = 5;
+
+  $(document).on('keyup', function (event) {
+    if (!game.playing) {
+      return;
+    }
+    if (game.difficulty != 'easy') {
+      return;
+    }
+
+    var choiceIx = key_choices[event.which];
+    if (choiceIx !== undefined) {
+      var choicePerson = currentPerson().choices[choiceIx];
+      processGuess(choicePerson.name);
+    }
+  });
+
   $(document).on('keyup', '.answer input', function (event) {
     if (event.which === 13) {
       var guess = $(this).val();
       var validPerson = allPeople.filter(function (person) { return person.name === guess; }).length > 0;
-      if (difficulty == 'hard' || (difficulty == 'medium' && validPerson)) {
+      if (game.difficulty == 'hard' || (game.difficulty == 'medium' && validPerson)) {
         processGuess(guess);
       }
     }
