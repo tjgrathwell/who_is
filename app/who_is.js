@@ -1,7 +1,6 @@
 var game = {
   playing: false,
   score: 0,
-  score: 0,
   wrong: 0,
   guesses: 0,
   difficulty: 'easy',
@@ -10,7 +9,7 @@ var game = {
       return 100;
     } else {
       var pct = (this.score / this.guesses) * 100;
-      pct.toString().substr(0, 2);
+      return pct.toString().substr(0, 2);
     }
   }
 };
@@ -20,7 +19,8 @@ var currentPeople = [];
 
 var templates = {
   person: Handlebars.compile($("#person-template").html()),
-  previous: Handlebars.compile($("#previous-template").html())
+  previous: Handlebars.compile($("#previous-template").html()),
+  score: Handlebars.compile($("#score-template").html())
 };
 
 var storage = {
@@ -138,10 +138,14 @@ function renderFailure(person) {
 }
 
 function renderScore() {
-  $('#total').text(currentPeople.length);
-  $('#score').text(game.score);
-  $('#incorrect').text(game.wrong);
-  $('#percentage').text(game.percentage());
+  var $el = $('.scores');
+  $el.empty();
+  $el.append(templates.score({
+    total: currentPeople.length,
+    score: game.score,
+    incorrect: game.wrong,
+    percentage: game.percentage()
+  }));
 }
 
 function processGuess(guess) {

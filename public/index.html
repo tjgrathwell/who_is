@@ -5,6 +5,12 @@
   <title>Who is?</title>
   <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.css">
   <link rel="stylesheet" href="assets/who_is.css">
+  <script id="score-template" type="text/x-handlebars-template">
+    <h2>Your Score: {{score}} correct, {{incorrect}} incorrect</h2>
+
+    <h2>({{percentage}}%, {{total}} remain)</h2>
+  </script>
+
   <script id="person-template" type="text/x-handlebars-template">
     <div class="person">
       <h3>Who is this?</h3>
@@ -56,9 +62,6 @@
 
     <div class="row">
       <div class="col-md-12 scores">
-        <h2>Your Score: <span id="score"></span> correct, <span id="incorrect"></span> incorrect</h2>
-
-        <h2>(<span id="percentage"></span>%, <span id="total"></span> remain)</h2>
       </div>
     </div>
   </div>
@@ -70,22 +73,18 @@ http://fillmurray.com/200/200 Ghost Buster
 http://placekitten.com/200/200 Kitty Cat
 http://placecage.com/200/200 Ghost Rider</pre>
     <textarea></textarea>
-    <button>Begin!</button>
+    <button class="btn btn-primary">Begin!</button>
   </div>
 
   <div class="row" style="margin-top: 10px; margin-bottom: 18px;">
-    <div class="col-md-2 col-md-offset-5">
-      <label>
-        <div>
-          Difficulty:
-        </div>
-        <div>
-          <select class="difficulty pull-right form-control">
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-          </select>
-        </div>
+    <div class="col-md-6 col-md-offset-3">
+      <label class="difficulty-select">
+        Difficulty:
+        <select class="difficulty pull-right form-control">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
       </label>
     </div>
   </div>
