@@ -1,3 +1,7 @@
+function randInt (max) {
+  return Math.floor(Math.random() * max);
+}
+
 var game = {
   playing: false,
   score: 0,
@@ -13,9 +17,26 @@ var game = {
     }
   }
 };
-var currentPersonIndex;
-var allPeople = [];
-var currentPeople = [];
+
+var people = {
+  currentPersonIndex: null,
+  allPeople: [],
+  currentPeople: [],
+  personMatching: function (guess) {
+    return this.allPeople.filter(function (person) { return person.name == guess; })[0];
+  },
+  randomPerson: function () {
+    var personIx = randInt(this.allPeople.length);
+    return this.allPeople[personIx];
+  },
+  currentPerson: function () {
+    return this.currentPeople[this.currentPersonIndex];
+  },
+  chooseNewPerson: function () {
+    this.currentPersonIndex = randInt(this.currentPeople.length);;
+    return this.currentPerson();
+  }
+};
 
 var templates = {
   person: Handlebars.compile($("#person-template").html()),
@@ -48,13 +69,8 @@ var storage = {
   }())
 };
 
-function currentPerson() {
-  return currentPeople[currentPersonIndex];
-}
-
-function addPerson(personIndex) {
-  currentPersonIndex = personIndex;
-  var personToRender = addChoices(currentPerson(), personIndex);
+function addPerson(person) {
+  var personToRender = addChoices(person);
   personToRender.difficulty = {};
   personToRender.difficulty[game.difficulty] = true;
   renderPerson($('#question'), personToRender);
@@ -66,26 +82,20 @@ function addPerson(personIndex) {
   }, {
     name: 'people',
     displayKey: 'value',
-    source: substringMatcher(allPeople.map(function (person) { return person.name; }))
+    source: substringMatcher(people.allPeople.map(function (person) { return person.name; }))
   });
-}
-
-function randInt (max) {
-  return Math.floor(Math.random() * max);
 }
 
 function addChoices (person) {
   function randomChoice(exceptionNames) {
-    var personIx = randInt(allPeople.length);
-    var randomPerson = allPeople[personIx];
+    var randomPerson = people.randomPerson();
     while (_.include(exceptionNames, randomPerson.name)) {
-      personIx = randInt(allPeople.length);
-      randomPerson = allPeople[personIx];
+      randomPerson = people.randomPerson();
     }
     return randomPerson;
   }
 
-  var numChoices = Math.min(allPeople.length, 6);
+  var numChoices = Math.min(people.allPeople.length, 6);
   var choices = [];
   while (choices.length < numChoices - 1) {
     var exceptionNames = choices.concat(person.name);
@@ -116,17 +126,16 @@ function renderPrevious($el, answerPerson, guessedPerson) {
 }
 
 function addRandomPerson() {
-  var personIx = randInt(currentPeople.length);
-  addPerson(personIx);
+  addPerson(people.chooseNewPerson());
   $('.answer input').focus();
 }
 
 function fullMatch(guess) {
-  return guess.toLowerCase() === currentPerson().name.toLowerCase();
+  return guess.toLowerCase() === people.currentPerson().name.toLowerCase();
 }
 
 function partialCredit(guess) {
-  return guess.toLowerCase().split(' ')[0] === currentPerson().name.toLowerCase().split(' ')[0];
+  return guess.toLowerCase().split(' ')[0] === people.currentPerson().name.toLowerCase().split(' ')[0];
 }
 
 function renderFailure(person) {
@@ -141,7 +150,7 @@ function renderScore() {
   var $el = $('.scores');
   $el.empty();
   $el.append(templates.score({
-    total: currentPeople.length,
+    total: people.currentPeople.length,
     score: game.score,
     incorrect: game.wrong,
     percentage: game.percentage()
@@ -149,13 +158,13 @@ function renderScore() {
 }
 
 function processGuess(guess) {
-  var thisPerson = currentPerson();
+  var thisPerson = people.currentPerson();
 
   game.guesses += 1;
   thisPerson.guessedCorrectly = false;
   if (fullMatch(guess)) {
     thisPerson.guessedCorrectly = true;
-    currentPeople.splice(currentPersonIndex, 1);
+    people.currentPeople.splice(people.currentPersonIndex, 1);
     game.score += 1;
   } else if (partialCredit(guess)) {
     game.score += .5;
@@ -166,9 +175,9 @@ function processGuess(guess) {
 
   renderScore();
 
-  if (currentPeople.length > 0) {
+  if (people.currentPeople.length > 0) {
     addRandomPerson();
-    var guessedPerson = allPeople.filter(function (person) { return person.name == guess; })[0];
+    var guessedPerson = people.personMatching(guess);
     renderPrevious($('#answer'), thisPerson, guessedPerson);
   } else {
     $('.replay').removeClass('hidden');
@@ -197,7 +206,7 @@ function startGuessing() {
 
   setGameVisibility(true);
 
-  currentPeople = allPeople.slice(0);
+  people.currentPeople = people.allPeople.slice(0);
 
   addRandomPerson();
 
@@ -252,8 +261,8 @@ $(document).ready(function () {
   $('select.difficulty').val(game.difficulty);
 
   $(document).on('click', '.entry button', function (event) {
-    allPeople = parseTextarea();
-    storage.store('who_is.people', JSON.stringify(allPeople));
+    people.allPeople = parseTextarea();
+    storage.store('who_is.people', JSON.stringify(people.allPeople));
 
     startGuessing();
   });
@@ -300,7 +309,7 @@ $(document).ready(function () {
 
     var choiceIx = key_choices[event.which];
     if (choiceIx !== undefined) {
-      var choicePerson = currentPerson().choices[choiceIx];
+      var choicePerson = people.currentPerson().choices[choiceIx];
       processGuess(choicePerson.name);
     }
   });
@@ -308,7 +317,7 @@ $(document).ready(function () {
   $(document).on('keyup', '.answer input', function (event) {
     if (event.which === 13) {
       var guess = $(this).val();
-      var validPerson = allPeople.filter(function (person) { return person.name === guess; }).length > 0;
+      var validPerson = people.personMatching(guess);
       if (game.difficulty == 'hard' || (game.difficulty == 'medium' && validPerson)) {
         processGuess(guess);
       }
@@ -324,8 +333,8 @@ $(document).ready(function () {
     processGuess(guess);
   });
 
-  storage.retrieve('people', function (people) {
-    allPeople = JSON.parse(people);
+  storage.retrieve('people', function (savedPeople) {
+    people.allPeople = JSON.parse(savedPeople);
     startGuessing();
   });
 });
