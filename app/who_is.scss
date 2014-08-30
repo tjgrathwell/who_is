@@ -24,6 +24,11 @@ img.photo {
   height: 200px;
 }
 
+img.photo-small {
+  width: 75px;
+  height: 75px;
+}
+
 .entry {
   width: 800px;
   margin: 0 auto;
@@ -47,10 +52,6 @@ img.photo {
 
   &.failure {
     border-color: rgb(255, 150, 150);
-    img {
-      width: 75px;
-      height: 75px;
-    }
   }
 }
 

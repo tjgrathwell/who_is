@@ -23,7 +23,7 @@ var people = {
   allPeople: [],
   currentPeople: [],
   personMatching: function (guess) {
-    return this.allPeople.filter(function (person) { return person.name == guess; })[0];
+    return this.allPeople.filter(function (person) { return person.name.toLowerCase() == guess.toLowerCase(); })[0];
   },
   randomPerson: function () {
     var personIx = randInt(this.allPeople.length);
