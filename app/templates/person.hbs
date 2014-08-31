@@ -1,0 +1,18 @@
+<div class="person">
+  <h3>Who is this?</h3>
+  <img class="photo" src="{{photo}}" />
+
+  <div class="answer">
+    {{#if difficulty.easy}}
+      {{#each choices}}
+        <button class="choice">{{name}}</button>
+      {{/each}}
+    {{/if}}
+    {{#if difficulty.medium}}
+      <input class="typeahead" placeholder="Who is it?" autofocus>
+    {{/if}}
+    {{#if difficulty.hard}}
+      <input class='form-control' placeholder="Who is it?" autofocus>
+    {{/if}}
+  </div>
+</div>

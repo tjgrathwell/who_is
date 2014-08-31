@@ -39,9 +39,9 @@ var people = {
 };
 
 var templates = {
-  person: Handlebars.compile($("#person-template").html()),
-  previous: Handlebars.compile($("#previous-template").html()),
-  score: Handlebars.compile($("#score-template").html())
+  person: personTemplate,
+  previous: previousTemplate,
+  score: scoreTemplate
 };
 
 var storage = {
