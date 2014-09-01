@@ -17,6 +17,9 @@ TemplateFilter.prototype.targetExtension = 'js'
 
 TemplateFilter.prototype.processString = function (string, path) {
   var templateName = path.match(/(\w+)\.hbs/)[1];
-  return 'var ' + templateName + 'Template = ' + this.compileFunction +
-  '("' + jsStringEscape(string) + '");\n'
+  var templateLoadLines = [];
+  templateLoadLines.push('window.templates = window.templates || {};');
+  templateLoadLines.push('templates[\'' + templateName + '\'] = ' + this.compileFunction +
+  '("' + jsStringEscape(string) + '");');
+  return templateLoadLines.join("\n");
 }

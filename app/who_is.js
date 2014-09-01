@@ -38,12 +38,6 @@ var people = {
   }
 };
 
-var templates = {
-  person: personTemplate,
-  previous: previousTemplate,
-  score: scoreTemplate
-};
-
 var storage = {
   retrieve: function (key, callback, defaultValue) {
     if (this.supported) {
@@ -271,7 +265,9 @@ $(document).ready(function () {
     game.difficulty = $('select.difficulty').val();
     storage.store('difficulty', game.difficulty);
 
-    startGuessing();
+    if (game.playing) {
+      startGuessing();
+    }
   });
 
   $(document).on('click', '.replay button', function (event) {
