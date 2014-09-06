@@ -39,19 +39,35 @@ var people = {
 };
 
 var storage = {
+  _parseValue: function (value) {
+    if (value && _.include(['[', '{'], value[0])) {
+      return JSON.parse(value);
+    } else {
+      return value;
+    }
+  },
+  _serialValue: function (value) {
+    if (typeof value === 'string') {
+      return value;
+    } else {
+      return JSON.stringify(value);
+    }
+  },
   retrieve: function (key, callback, defaultValue) {
     if (this.supported) {
       var value = localStorage['who_is.' + key];
       if (value) {
-        callback(value);
+        callback(this._parseValue(value));
+        return;
       }
-    } else if (defaultValue) {
+    }
+    if (defaultValue) {
       callback(defaultValue);
     }
   },
   store: function (key, value) {
     if (this.supported) {
-      localStorage['who_is.' + key] = value;
+      localStorage['who_is.' + key] = this._serialValue(value);
     }
   },
   supported: (function () {
@@ -151,6 +167,21 @@ function renderScore() {
   }));
 }
 
+function renderSavedPeople() {
+  storage.retrieve('saved_people', function (savedPeople) {
+    console.log(savedPeople);
+    var renderData = [];
+    _.each(savedPeople, function (people, name) {
+      renderData.push({name: name, count: people.length});
+    });
+    var $el = $('.saved-people');
+    $el.empty();
+    if (renderData.length > 0) {
+      $el.append(templates.saved_people({savedGroups: renderData}));
+    }
+  }, {});
+}
+
 function processGuess(guess) {
   var thisPerson = people.currentPerson();
 
@@ -181,6 +212,9 @@ function processGuess(guess) {
 function setGameVisibility(playing) {
   game.playing = playing;
   $('.entry').toggleClass('hidden', playing);
+  if (!playing) {
+    renderSavedPeople();
+  }
   $('.game').toggleClass('hidden', !playing);
   $('.restart').toggleClass('hidden', !playing);
   $('#answer')
@@ -254,11 +288,22 @@ $(document).ready(function () {
   }, 'easy');
   $('select.difficulty').val(game.difficulty);
 
-  $(document).on('click', '.entry button', function (event) {
-    people.allPeople = parseTextarea();
-    storage.store('who_is.people', JSON.stringify(people.allPeople));
+  function startGameWithPeople(thesePeople) {
+    people.allPeople = thesePeople;
+    storage.store('people', people.allPeople);
+    var savedName = $('.save-as-name').val();
+    if (savedName) {
+      storage.retrieve('saved_people', function (savedPeople) {
+        savedPeople[savedName] = people.allPeople;
+        storage.store('saved_people', savedPeople);
+      }, {});
+    }
 
     startGuessing();
+  }
+
+  $(document).on('click', '.begin-button', function (event) {
+    startGameWithPeople(parseTextarea());
   });
 
   $(document).on('change', 'select.difficulty', function () {
@@ -329,8 +374,23 @@ $(document).ready(function () {
     processGuess(guess);
   });
 
-  storage.retrieve('people', function (savedPeople) {
-    people.allPeople = JSON.parse(savedPeople);
-    startGuessing();
+  $(document).on('click', '.start-with-saved', function (event) {
+    storage.retrieve('saved_people', function (savedPeople) {
+      startGameWithPeople(savedPeople[$(event.target).data('name')]);
+    });
   });
+
+  $(document).on('click', '.clear-saved', function (event) {
+    storage.store('saved_people', {});
+    renderSavedPeople();
+  });
+
+  storage.retrieve('people', function (savedPeople) {
+    if (savedPeople) {
+      people.allPeople = savedPeople;
+      startGuessing();
+    } else {
+      renderSavedPeople();
+    }
+  }, null);
 });

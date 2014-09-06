@@ -1,0 +1,7 @@
+<h2>Saved Lists:</h2>
+<ul>
+{{#each savedGroups}}
+  <li><a href="#" class='start-with-saved' data-name="{{name}}">{{name}}</a>: {{count}} items</li>
+{{/each}}
+</ul>
+<button class="btn btn-primary clear-saved">Clear Saved Lists</button>
