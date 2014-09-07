@@ -172,7 +172,10 @@ function renderSavedPeople() {
     console.log(savedPeople);
     var renderData = [];
     _.each(savedPeople, function (people, name) {
-      renderData.push({name: name, count: people.length});
+      var sample = people.slice(0, 3).map(function (person) {
+        return person.name;
+      }).join(', ');
+      renderData.push({name: name, count: people.length, sample: sample});
     });
     var $el = $('.saved-people');
     $el.empty();
@@ -381,7 +384,15 @@ $(document).ready(function () {
   });
 
   $(document).on('click', '.clear-saved', function (event) {
-    storage.store('saved_people', {});
+    var valueToStore = {};
+    var name = $(event.target).data('name');
+    if (name) {
+      storage.retrieve('saved_people', function (savedPeople) {
+        delete savedPeople[name];
+        valueToStore = savedPeople;
+      });
+    }
+    storage.store('saved_people', valueToStore);
     renderSavedPeople();
   });
 
