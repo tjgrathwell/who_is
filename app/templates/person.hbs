@@ -1,6 +1,10 @@
 <div class="person">
-  <h3>Who is this?</h3>
-  <img class="photo" src="{{photo}}" />
+  {{#if difficulty.reverse}}
+    <h3>Who is {{name}}?</h3>
+  {{else}}
+    <h3>Who is this?</h3>
+    <img class="photo" src="{{photo}}" />
+  {{/if}}
 
   <div class="answer">
     {{#if difficulty.easy}}
@@ -13,6 +17,13 @@
     {{/if}}
     {{#if difficulty.hard}}
       <input class='form-control' placeholder="Who is it?" autofocus>
+    {{/if}}
+    {{#if difficulty.reverse}}
+      <div class="choice-images">
+        {{#each choices}}
+          <img src="{{photo}}" data-name="{{name}}">
+        {{/each}}
+      </div>
     {{/if}}
   </div>
 </div>

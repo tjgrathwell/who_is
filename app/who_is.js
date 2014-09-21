@@ -80,7 +80,7 @@ var storage = {
 };
 
 function addPerson(person) {
-  var personToRender = addChoices(person);
+  var personToRender = addChoices(person, game.difficulty);
   personToRender.difficulty = {};
   personToRender.difficulty[game.difficulty] = true;
   renderPerson($('#question'), personToRender);
@@ -109,13 +109,11 @@ function addChoices (person) {
   var choices = [];
   while (choices.length < numChoices - 1) {
     var exceptionNames = choices.concat(person.name);
-    choices.push(randomChoice(exceptionNames).name);
+    choices.push(randomChoice(exceptionNames));
   }
 
-  choices.splice(randInt(numChoices), 0, person.name);
-  person.choices = _.map(choices, function (choiceName) {
-    return {name: choiceName};
-  });
+  choices.splice(randInt(numChoices), 0, person);
+  person.choices = choices;
   return person;
 }
 
@@ -126,10 +124,19 @@ function renderPerson($el, person) {
 
 function renderPrevious($el, answerPerson, guessedPerson) {
   $el.empty();
-  $el.append(templates.previous({
-    answerPerson: answerPerson,
-    guessedPerson: guessedPerson
-  }));
+  var previousContext;
+  if (game.difficulty == 'reverse') {
+    previousContext = {
+      answerPerson: guessedPerson,
+      guessedPerson: answerPerson
+    }
+  } else {
+    previousContext = {
+      answerPerson: answerPerson,
+      guessedPerson: guessedPerson
+    };
+  }
+  $el.append(templates.previous(previousContext));
   $el.removeClass('hidden');
   $el.toggleClass('success', answerPerson.guessedCorrectly);
   $el.toggleClass('failure', !answerPerson.guessedCorrectly);
@@ -374,6 +381,11 @@ $(document).ready(function () {
 
   $(document).on('click', 'button.choice', function (event) {
     var guess = $(this).text();
+    processGuess(guess);
+  });
+
+  $(document).on('click', '.choice-images img', function (event) {
+    var guess = $(this).data('name');
     processGuess(guess);
   });
 
