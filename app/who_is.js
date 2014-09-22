@@ -1,3 +1,7 @@
+String.prototype.toTitleCase = function () {
+  return this[0].toUpperCase() + this.substr(1);
+};
+
 function randInt (max) {
   return Math.floor(Math.random() * max);
 }
@@ -176,7 +180,6 @@ function renderScore() {
 
 function renderSavedPeople() {
   storage.retrieve('saved_people', function (savedPeople) {
-    console.log(savedPeople);
     var renderData = [];
     _.each(savedPeople, function (people, name) {
       var sample = people.slice(0, 3).map(function (person) {
@@ -296,6 +299,15 @@ $(document).ready(function () {
   storage.retrieve('difficulty', function (value) {
     game.difficulty = value;
   }, 'easy');
+
+  var difficultyContext = {
+    difficulties: _.map([
+      'easy', 'medium', 'hard', 'reverse'
+    ], function (level) {
+      return {name: level.toTitleCase(), value: level};
+    })
+  };
+  $('.difficulty-select-container').append(templates.difficulty_select(difficultyContext));
   $('select.difficulty').val(game.difficulty);
 
   function startGameWithPeople(thesePeople) {
