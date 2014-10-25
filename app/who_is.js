@@ -111,9 +111,11 @@ function addChoices (person) {
 
   var numChoices = Math.min(people.allPeople.length, 6);
   var choices = [];
+  var exceptionNames = [person.name];
   while (choices.length < numChoices - 1) {
-    var exceptionNames = choices.concat(person.name);
-    choices.push(randomChoice(exceptionNames));
+    var randomPerson = randomChoice(exceptionNames);
+    choices.push(randomPerson);
+    exceptionNames.push(randomPerson.name);
   }
 
   choices.splice(randInt(numChoices), 0, person);
