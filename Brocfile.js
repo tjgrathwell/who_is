@@ -3,7 +3,7 @@ var compileSass = require('broccoli-sass');
 var filterTemplates = require('./broccoli-extensions/compile-templates');
 var concatFiles = require('broccoli-concat');
 
-var appCss = compileSass(['app'], 'who_is.scss', 'assets/who_is.css');
+var appCss = compileSass(['app'], 'styles/main.scss', 'assets/who_is.css');
 
 var appJs = filterTemplates('app', {
   extensions: ['hbs'],
