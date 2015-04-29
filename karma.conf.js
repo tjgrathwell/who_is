@@ -1,4 +1,5 @@
 var fs = require('fs');
+var npmDepsList = require('./npm-deps-list');
 
 module.exports = function(config) {
   var options = {
@@ -36,20 +37,16 @@ module.exports = function(config) {
       'app/templates/**/*.hbs': 'handlebars',
       'test/**/*_spec.js': ['babel']
     },
-    files: [
-      'http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js',
-      'http://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.jquery.min.js',
-      'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js',
-      'http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.4/handlebars.min.js',
-      'http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.20/require.min.js',
-      'node_modules/requirejs/require.js',
+    files: npmDepsList.map(function (dep) {
+      return ['node_modules', dep].join('/');
+    }).concat([
       'node_modules/karma-requirejs/lib/adapter.js',
       'app/templates/*.hbs',
       'app/**/*.js',
       'test/*_spec.js',
       'test/test-main.js',
       'test/helpers/*.js'
-    ],
+    ]),
     plugins: config.plugins
   };
 
