@@ -11,6 +11,7 @@ var game = {
   score: 0,
   wrong: 0,
   guesses: 0,
+  failures: [],
   difficulty: 'easy',
   percentage: function () {
     if (this.score === this.guesses) {
@@ -163,10 +164,10 @@ function partialCredit(guess) {
 
 function renderFailure(person) {
   $('.failures').removeClass('hidden');
-  var img = $('<img></img>');
-  img.attr('src', person.photo);
-  img.attr('title', person.name);
-  $('.failures .photos').append(img);
+  game.failures.push({name: person.name, photo: person.photo});
+  $('.failures .photos').html(templates.failures({
+    people: game.failures
+  }));
 }
 
 function renderScore() {
@@ -246,6 +247,7 @@ function startGuessing() {
   game.score = 0;
   game.wrong = 0;
   game.guesses = 0;
+  game.failures = [];
 
   setGameVisibility(true);
 
@@ -312,10 +314,9 @@ $(document).ready(function () {
   $('.difficulty-select-container').append(templates.difficulty_select(difficultyContext));
   $('select.difficulty').val(game.difficulty);
 
-  function startGameWithPeople(thesePeople) {
-    people.allPeople = thesePeople;
+  function startGameWithPeople(thesePeople, savedName) {
+    people.allPeople = _.uniq(thesePeople, function (p) { return p.name; });
     storage.store('people', people.allPeople);
-    var savedName = $('.save-as-name').val();
     if (savedName) {
       storage.retrieve('saved_people', function (savedPeople) {
         savedPeople[savedName] = people.allPeople;
@@ -327,7 +328,7 @@ $(document).ready(function () {
   }
 
   $(document).on('click', '.begin-button', function (event) {
-    startGameWithPeople(parseTextarea());
+    startGameWithPeople(parseTextarea(), $('.save-as-name').val());
   });
 
   $(document).on('change', 'select.difficulty', function () {
@@ -393,6 +394,21 @@ $(document).ready(function () {
     setGameVisibility(false);
   });
 
+  $(document).on('click', '.restart-mistakes button', function (event) {
+    var now = new Date();
+    var date = [
+      now.getFullYear(),
+      (now.getMonth() + 1),
+      now.getDate()
+    ].join('-');
+
+    var time = [
+      now.getHours(),
+      now.getMinutes()
+    ].join(':');
+    startGameWithPeople(game.failures, 'Mistakes ' + [date, time].join(' '));
+  });
+
   $(document).on('click', 'button.choice', function (event) {
     var guess = $(this).text();
     processGuess(guess);
@@ -405,7 +421,7 @@ $(document).ready(function () {
 
   $(document).on('click', '.start-with-saved', function (event) {
     storage.retrieve('saved_people', function (savedPeople) {
-      startGameWithPeople(savedPeople[$(event.target).data('name')]);
+      startGameWithPeople(savedPeople[$(event.target).data('name')], $('.save-as-name').val());
     });
   });
 
@@ -424,7 +440,7 @@ $(document).ready(function () {
 
   storage.retrieve('people', function (savedPeople) {
     if (savedPeople) {
-      people.allPeople = savedPeople;
+      people.allPeople = _.uniq(savedPeople, function (p) { return p.name; });
       startGuessing();
     } else {
       renderSavedPeople();
