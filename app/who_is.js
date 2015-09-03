@@ -2,6 +2,10 @@ String.prototype.toTitleCase = function () {
   return this[0].toUpperCase() + this.substr(1);
 };
 
+function quote_for_regexp(str) {
+  return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
+}
+
 function randInt (max) {
   return Math.floor(Math.random() * max);
 }
@@ -283,7 +287,7 @@ var substringMatcher = function(strs) {
     matches = [];
 
     // regex used to determine if a string contains the substring `q`
-    substrRegex = new RegExp(q, 'i');
+    substrRegex = new RegExp(quote_for_regexp(q), 'i');
 
     // iterate through the pool of strings and for any string that
     // contains the substring `q`, add it to the `matches` array
