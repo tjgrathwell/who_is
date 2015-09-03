@@ -10,6 +10,16 @@ function randInt (max) {
   return Math.floor(Math.random() * max);
 }
 
+var KEYS = {
+  W: 87,
+  A: 65,
+  S: 83,
+  UP: 38,
+  RIGHT: 39,
+  DOWN: 40,
+  ESC: 27
+};
+
 var game = {
   playing: false,
   score: 0,
@@ -22,7 +32,7 @@ var game = {
       return 100;
     } else {
       var pct = (this.score / this.guesses) * 100;
-      return pct.toString().substr(0, 2);
+      return pct.toFixed();
     }
   }
 };
@@ -93,7 +103,7 @@ function addPerson(person) {
   personToRender.difficulty = {};
   personToRender.difficulty[game.difficulty] = true;
   renderPerson($('#question'), personToRender);
-  $('.typeahead').typeahead({
+  var typeahead = $('.typeahead').typeahead({
     hint: true,
     highlight: true,
     autoselect: true,
@@ -103,6 +113,18 @@ function addPerson(person) {
     displayKey: 'value',
     source: substringMatcher(people.allPeople.map(function (person) { return person.name; }))
   });
+
+  function skipPersonOnEsc (e) {
+    if (e.which == KEYS.ESC) {
+      processGuess(null);
+    }
+  }
+
+  if (typeahead.length > 0) {
+    $('.tt-input').keydown(skipPersonOnEsc);
+  } else {
+    $('.answer input').keydown(skipPersonOnEsc);
+  }
 }
 
 function addChoices (person) {
@@ -207,11 +229,11 @@ function processGuess(guess) {
 
   game.guesses += 1;
   thisPerson.guessedCorrectly = false;
-  if (fullMatch(guess)) {
+  if (guess && fullMatch(guess)) {
     thisPerson.guessedCorrectly = true;
     people.currentPeople.splice(people.currentPersonIndex, 1);
     game.score += 1;
-  } else if (partialCredit(guess)) {
+  } else if (guess && partialCredit(guess)) {
     game.score += .5;
   } else {
     game.wrong += 1;
@@ -222,8 +244,12 @@ function processGuess(guess) {
 
   if (people.currentPeople.length > 0) {
     addRandomPerson();
-    var guessedPerson = people.personMatching(guess);
-    renderPrevious($('#answer'), thisPerson, guessedPerson);
+    if (guess) {
+      var guessedPerson = people.personMatching(guess);
+      renderPrevious($('#answer'), thisPerson, guessedPerson);
+    } else {
+      renderPrevious($('#answer'), thisPerson, null);
+    }
   } else {
     $('.replay').removeClass('hidden');
   }
@@ -348,26 +374,17 @@ $(document).ready(function () {
     startGuessing();
   });
 
-  var keys = {
-    W: 87,
-    A: 65,
-    S: 83,
-    UP: 38,
-    RIGHT: 39,
-    DOWN: 40
-  };
-
   //  0/W    1/^
   //  2/A    3/>
   //  4/S    5/v
 
   var key_choices = {};
-  key_choices[keys.W] = 0;
-  key_choices[keys.A] = 2;
-  key_choices[keys.S] = 4;
-  key_choices[keys.UP] = 1;
-  key_choices[keys.RIGHT] = 3;
-  key_choices[keys.DOWN] = 5;
+  key_choices[KEYS.W] = 0;
+  key_choices[KEYS.A] = 2;
+  key_choices[KEYS.S] = 4;
+  key_choices[KEYS.UP] = 1;
+  key_choices[KEYS.RIGHT] = 3;
+  key_choices[KEYS.DOWN] = 5;
 
   $(document).on('keyup', function (event) {
     if (!game.playing) {
