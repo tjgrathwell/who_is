@@ -1,4 +1,14 @@
-<h1 style="text-align: center;">{{#if answerPerson.guessedCorrectly}}YES{{else}}NO{{/if}}</h1>
+<h1 style="text-align: center;">
+  {{#if answerPerson.guessedCorrectly}}
+    YES
+  {{else}}
+    {{#if answerPerson.guessedPartially}}
+      ALMOST
+    {{else}}
+      NO
+    {{/if}}
+  {{/if}}
+</h1>
 <img class="photo {{#unless answerPerson.guessedCorrectly}}{{#if guessedPerson}}photo-small{{/if}}{{/unless}}" src="{{answerPerson.photo}}"/>
 <h3>That was {{answerPerson.name}}</h3>
 {{#unless answerPerson.guessedCorrectly}}

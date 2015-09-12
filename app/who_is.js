@@ -226,14 +226,18 @@ function renderSavedPeople() {
 
 function processGuess(guess) {
   var thisPerson = people.currentPerson();
+  _.extend(thisPerson, {
+    guessedCorrectly: false,
+    guessedPartially: false
+  });
 
   game.guesses += 1;
-  thisPerson.guessedCorrectly = false;
   if (guess && fullMatch(guess)) {
     thisPerson.guessedCorrectly = true;
     people.currentPeople.splice(people.currentPersonIndex, 1);
     game.score += 1;
   } else if (guess && partialCredit(guess)) {
+    thisPerson.guessedPartially = true;
     game.score += .5;
   } else {
     game.wrong += 1;
