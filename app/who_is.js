@@ -34,6 +34,20 @@ var game = {
       var pct = (this.score / this.guesses) * 100;
       return pct.toFixed();
     }
+  },
+  personRenderOptions: function () {
+    if (this.difficulty == 'easy') {
+      return {showChoiceButtons: true};
+    }
+    if (this.difficulty == 'medium') {
+      return {showTypeahead: true};
+    }
+    if (this.difficulty.match(/^hard/)) {
+      return {showTextInput: true};
+    }
+    if (this.difficulty == 'reverse') {
+      return {showChoiceImages: true};
+    }
   }
 };
 
@@ -99,10 +113,8 @@ var storage = {
 };
 
 function addPerson(person) {
-  var personToRender = addChoices(person, game.difficulty);
-  personToRender.difficulty = {};
-  personToRender.difficulty[game.difficulty] = true;
-  renderPerson($('#question'), personToRender);
+  var personToRender = addChoices(person);
+  renderPerson($('#question'), _.extend({}, personToRender, game.personRenderOptions()));
   var typeahead = $('.typeahead').typeahead({
     hint: true,
     highlight: true,
@@ -232,7 +244,7 @@ function processGuess(guess) {
   });
 
   game.guesses += 1;
-  if (guess && fullMatch(guess)) {
+  if (guess && (fullMatch(guess) || (game.difficulty == 'hard' && partialCredit(guess)))) {
     thisPerson.guessedCorrectly = true;
     people.currentPeople.splice(people.currentPersonIndex, 1);
     game.score += 1;
@@ -340,7 +352,7 @@ $(document).ready(function () {
 
   var difficultyContext = {
     difficulties: _.map([
-      'easy', 'medium', 'hard', 'reverse'
+      'easy', 'medium', 'hard', 'hardest', 'reverse'
     ], function (level) {
       return {name: level.toTitleCase(), value: level};
     })
@@ -409,7 +421,7 @@ $(document).ready(function () {
     if (event.which === 13) {
       var guess = $(this).val();
       var validPerson = people.personMatching(guess);
-      if (game.difficulty == 'hard' || (game.difficulty == 'medium' && validPerson)) {
+      if (game.difficulty.match(/^hard/) || (game.difficulty == 'medium' && validPerson)) {
         processGuess(guess);
       }
     }
