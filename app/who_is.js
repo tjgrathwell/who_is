@@ -427,11 +427,11 @@ $(document).ready(function () {
     }
   });
 
-  $(document).on('click', '.restart button', function (event) {
+  $(document).on('click', '[data-link=restart]', function (event) {
     setGameVisibility(false);
   });
 
-  $(document).on('click', '.restart-mistakes button', function (event) {
+  $(document).on('click', '[data-link=restart-mistakes]', function (event) {
     var now = new Date();
     var date = [
       now.getFullYear(),
