@@ -6,9 +6,11 @@ var Filter = require('broccoli-filter')
 module.exports = TemplateFilter
 TemplateFilter.prototype = Object.create(Filter.prototype)
 TemplateFilter.prototype.constructor = TemplateFilter
-function TemplateFilter (inputTree, options) {
-  if (!(this instanceof TemplateFilter)) return new TemplateFilter(inputTree, options)
-  this.inputTree = inputTree
+function TemplateFilter (inputNode, options) {
+  if (!(this instanceof TemplateFilter)) return new TemplateFilter(inputNode, options)
+
+  Filter.call(this, inputNode, options)
+
   this.extensions = options.extensions
   this.compileFunction = options.compileFunction || ''
 }
