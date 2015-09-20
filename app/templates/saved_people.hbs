@@ -1,9 +1,22 @@
 <h2>Saved Lists:</h2>
-<ul>
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th>#</th>
+    <th>Name</th>
+    <th>Sample</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
 {{#each savedGroups}}
-  <li>
-    <a href="#" class='start-with-saved' data-name="{{name}}">{{name}}</a>: {{count}} items including {{sample}} <button class="btn btn-danger clear-saved" data-name="{{name}}">Delete</button>
-  </li>
+  <tr>
+    <td>{{count}}</td>
+    <td><a href="#" class='start-with-saved' data-name="{{name}}">{{name}}</a></td>
+    <td>{{sample}}</td>
+    <td><button class="btn btn-danger clear-saved" data-name="{{name}}">Delete</button></td>
+  </tr>
 {{/each}}
-</ul>
+  </tbody>
+</table>
 <button class="btn btn-primary clear-saved">Clear Saved Lists</button>
