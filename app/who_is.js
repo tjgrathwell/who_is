@@ -236,6 +236,11 @@ function renderSavedPeople() {
   }, {});
 }
 
+function renderPreview($row, people) {
+  $row.after('<tr><td colspan=5 class=saved-preview>' + templates.preview_people({people: people}) + '</td></tr>');
+  $row.find('.preview-saved').hide();
+}
+
 function processGuess(guess) {
   var thisPerson = people.currentPerson();
   _.extend(thisPerson, {
@@ -460,6 +465,15 @@ $(document).ready(function () {
     storage.retrieve('saved_people', function (savedPeople) {
       startGameWithPeople(savedPeople[$(event.target).data('name')], $('.save-as-name').val());
     });
+  });
+
+  $(document).on('click', '.preview-saved', function (event) {
+    var name = $(event.target).data('name');
+    if (name) {
+      storage.retrieve('saved_people', function (savedPeople) {
+        renderPreview($(event.target).closest('tr'), savedPeople[name]);
+      });
+    }
   });
 
   $(document).on('click', '.clear-saved', function (event) {
