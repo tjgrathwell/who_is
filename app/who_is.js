@@ -467,6 +467,22 @@ $(document).ready(function () {
     });
   });
 
+  $(document).on('click', '.rename-saved', function (event) {
+    var valueToStore = {};
+    var oldName = $(event.target).data('name');
+    var newName = prompt('Enter new name');
+    if (oldName && newName) {
+      storage.retrieve('saved_people', function (savedPeople) {
+        var list = savedPeople[oldName];
+        delete savedPeople[oldName];
+        savedPeople[newName] = list;
+        valueToStore = savedPeople;
+      });
+    }
+    storage.store('saved_people', valueToStore);
+    renderSavedPeople();
+  });
+
   $(document).on('click', '.preview-saved', function (event) {
     var name = $(event.target).data('name');
     if (name) {
