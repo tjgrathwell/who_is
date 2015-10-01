@@ -478,9 +478,10 @@ $(document).ready(function () {
         savedPeople[newName] = list;
         valueToStore = savedPeople;
       });
+
+      storage.store('saved_people', valueToStore);
+      renderSavedPeople();
     }
-    storage.store('saved_people', valueToStore);
-    renderSavedPeople();
   });
 
   $(document).on('click', '.preview-saved', function (event) {
@@ -493,6 +494,11 @@ $(document).ready(function () {
   });
 
   $(document).on('click', '.clear-saved', function (event) {
+    var result = confirm('Are you sure?');
+    if (!result) {
+      return;
+    }
+
     var valueToStore = {};
     var name = $(event.target).data('name');
     if (name) {
