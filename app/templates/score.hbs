@@ -1,3 +1,9 @@
-<h2>Your Score: {{score}} correct, {{incorrect}} incorrect</h2>
+<h2>{{score}} correct, {{incorrect}} incorrect ({{percentage}}%)</h2>
 
-<h2>({{percentage}}%, {{total}} remain)</h2>
+<h2>{{remaining}} of {{total}} remain</h2>
+
+<div class="progress">
+  <div class="progress-bar" role="progressbar" style="width: {{guessedPercentage}}%; min-width: 3em;">
+    {{guessedPercentage}}%
+  </div>
+</div>

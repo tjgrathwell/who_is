@@ -68,6 +68,11 @@ var people = {
   chooseNewPerson: function () {
     this.currentPersonIndex = randInt(this.currentPeople.length);;
     return this.currentPerson();
+  },
+  guessedPercentage: function () {
+    var guessed = this.allPeople.length - this.currentPeople.length;
+    var pct = (guessed / this.allPeople.length) * 100;
+    return pct.toFixed();
   }
 };
 
@@ -212,7 +217,9 @@ function renderScore() {
   var $el = $('.scores');
   $el.empty();
   $el.append(templates.score({
-    total: people.currentPeople.length,
+    total: people.allPeople.length,
+    remaining: people.currentPeople.length,
+    guessedPercentage: people.guessedPercentage(),
     score: game.score,
     incorrect: game.wrong,
     percentage: game.percentage()
