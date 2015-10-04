@@ -108,6 +108,11 @@ var storage = {
       localStorage['who_is.' + key] = this._serialValue(value);
     }
   },
+  remove: function (key) {
+    if (this.supported) {
+      localStorage.removeItem(['who_is.' + key]);
+    }
+  },
   supported: (function () {
     try {
       return 'localStorage' in window && window['localStorage'] !== null;
@@ -278,15 +283,38 @@ function processGuess(guess) {
     } else {
       renderPrevious($('#answer'), thisPerson, null);
     }
+
+    persistState();
   } else {
+    clearState();
     $('.replay').removeClass('hidden');
   }
+}
+
+function persistState () {
+  storage.store('saved_state', {
+    people: {
+      currentPeopleNames: _.pluck(people.currentPeople, 'name')
+    },
+    game: {
+      score: game.score,
+      wrong: game.wrong,
+      guesses: game.guesses,
+      failures: game.failures,
+      difficulty: game.difficulty
+    }
+  });
+}
+
+function clearState () {
+  storage.remove('saved_state');
 }
 
 function setGameVisibility(playing) {
   game.playing = playing;
   $('.entry').toggleClass('hidden', playing);
   if (!playing) {
+    clearState();
     renderSavedPeople();
   }
   $('.game').toggleClass('hidden', !playing);
@@ -521,7 +549,23 @@ $(document).ready(function () {
   storage.retrieve('people', function (savedPeople) {
     if (savedPeople) {
       people.allPeople = _.uniq(savedPeople, function (p) { return p.name; });
-      startGuessing();
+
+      storage.retrieve('saved_state', function (savedState) {
+        if (savedState) {
+          people.currentPeople = _.filter(people.allPeople, function (p) {
+            return _.include(savedState.people.currentPeopleNames, p.name);
+          });
+          _.extend(game, savedState.game);
+
+          setGameVisibility(true);
+
+          addRandomPerson();
+
+          renderScore();
+        } else {
+          startGuessing();
+        }
+      });
     } else {
       renderSavedPeople();
     }
