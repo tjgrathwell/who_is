@@ -287,6 +287,7 @@ function processGuess(guess) {
     persistState();
   } else {
     clearState();
+    $('#question').addClass('hidden');
     $('.replay').removeClass('hidden');
   }
 }
@@ -319,6 +320,7 @@ function setGameVisibility(playing) {
   }
   $('.game').toggleClass('hidden', !playing);
   $('.restart').toggleClass('hidden', !playing);
+  $('#question').removeClass('hidden');
   $('#answer')
     .empty()
     .removeClass('success')
@@ -342,6 +344,10 @@ function startGuessing() {
   addRandomPerson();
 
   renderScore();
+}
+
+function showMainContainer () {
+  $('.game-container').css('visibility', 'visible');
 }
 
 function strip(str) {
@@ -551,7 +557,7 @@ $(document).ready(function () {
       people.allPeople = _.uniq(savedPeople, function (p) { return p.name; });
 
       storage.retrieve('saved_state', function (savedState) {
-        if (savedState) {
+        if (savedState && _.keys(savedState).length > 0) {
           people.currentPeople = _.filter(people.allPeople, function (p) {
             return _.include(savedState.people.currentPeopleNames, p.name);
           });
@@ -565,9 +571,13 @@ $(document).ready(function () {
         } else {
           startGuessing();
         }
-      });
+
+        showMainContainer();
+      }, {});
     } else {
       renderSavedPeople();
+
+      showMainContainer();
     }
   }, null);
 });

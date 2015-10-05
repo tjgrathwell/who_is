@@ -10,6 +10,10 @@ body {
   display: none !important;
 }
 
+.game-container {
+  visibility: hidden;
+}
+
 .person {
   text-align: center;
   margin: 0 auto;
