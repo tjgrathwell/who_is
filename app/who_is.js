@@ -210,9 +210,12 @@ function partialCredit(guess) {
   return guess.toLowerCase().split(' ')[0] === people.currentPerson().name.toLowerCase().split(' ')[0];
 }
 
-function renderFailure(person) {
+function renderFailures() {
+  if (game.failures.length === 0) {
+    return;
+  }
+
   $('.failures').removeClass('hidden');
-  game.failures.push({name: person.name, photo: person.photo});
   $('.failures .photos').html(templates.failures({
     people: game.failures
   }));
@@ -270,7 +273,8 @@ function processGuess(guess) {
     game.score += .5;
   } else {
     game.wrong += 1;
-    renderFailure(thisPerson);
+    game.failures.push({name: thisPerson.name, photo: thisPerson.photo});
+    renderFailures();
   }
 
   renderScore();
@@ -295,6 +299,9 @@ function processGuess(guess) {
 function persistState () {
   storage.store('saved_state', {
     people: {
+      allPeople: _.map(people.allPeople, function (person) {
+        return {name: person.name, photo: person.photo};
+      }),
       currentPeopleNames: _.pluck(people.currentPeople, 'name')
     },
     game: {
@@ -311,7 +318,7 @@ function clearState () {
   storage.remove('saved_state');
 }
 
-function setGameVisibility(playing) {
+function setGameVisibility(playing, resuming) {
   game.playing = playing;
   $('.entry').toggleClass('hidden', playing);
   if (!playing) {
@@ -319,16 +326,20 @@ function setGameVisibility(playing) {
     renderSavedPeople();
   }
   $('.game').toggleClass('hidden', !playing);
-  $('.restart').toggleClass('hidden', !playing);
   $('#question').removeClass('hidden');
   $('#answer')
     .empty()
     .removeClass('success')
     .removeClass('failure')
-    .toggleClass('hidden', !playing || (game.guesses === 0));
+    .toggleClass('hidden', !playing || resuming || (game.guesses === 0));
   $('.replay').addClass('hidden');
-  $('.failures').addClass('hidden');
-  $('.failures .photos').empty();
+
+  var showFailures = resuming && game.failures.length > 1;
+  $('.failures').toggleClass('hidden', !showFailures);
+  $('.restart').toggleClass('hidden', !showFailures);
+  if (!showFailures) {
+    $('.failures .photos').empty();
+  }
 }
 
 function startGuessing() {
@@ -552,32 +563,24 @@ $(document).ready(function () {
     renderSavedPeople();
   });
 
-  storage.retrieve('people', function (savedPeople) {
-    if (savedPeople) {
-      people.allPeople = _.uniq(savedPeople, function (p) { return p.name; });
+  storage.retrieve('saved_state', function (savedState) {
+    if (savedState && _.keys(savedState).length > 0) {
+      people.allPeople = savedState.people.allPeople;
+      people.currentPeople = _.filter(people.allPeople, function (p) {
+        return _.include(savedState.people.currentPeopleNames, p.name);
+      });
+      _.extend(game, savedState.game);
 
-      storage.retrieve('saved_state', function (savedState) {
-        if (savedState && _.keys(savedState).length > 0) {
-          people.currentPeople = _.filter(people.allPeople, function (p) {
-            return _.include(savedState.people.currentPeopleNames, p.name);
-          });
-          _.extend(game, savedState.game);
+      setGameVisibility(true, true);
 
-          setGameVisibility(true);
+      addRandomPerson();
 
-          addRandomPerson();
-
-          renderScore();
-        } else {
-          startGuessing();
-        }
-
-        showMainContainer();
-      }, {});
+      renderFailures();
+      renderScore();
     } else {
       renderSavedPeople();
-
-      showMainContainer();
     }
-  }, null);
+
+    showMainContainer();
+  }, {});
 });
