@@ -1,14 +1,7 @@
-String.prototype.toTitleCase = function () {
-  return this[0].toUpperCase() + this.substr(1);
-};
-
-function quote_for_regexp(str) {
-  return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
-}
-
-function randInt (max) {
-  return Math.floor(Math.random() * max);
-}
+import storage from './modules/storage';
+import {randInt} from './modules/random';
+import substringMatcher from './modules/substring_matcher';
+import './modules/monkeypatches';
 
 var KEYS = {
   W: 87,
@@ -74,52 +67,6 @@ var people = {
     var pct = (guessed / this.allPeople.length) * 100;
     return pct.toFixed();
   }
-};
-
-var storage = {
-  _parseValue: function (value) {
-    if (value && _.include(['[', '{'], value[0])) {
-      return JSON.parse(value);
-    } else {
-      return value;
-    }
-  },
-  _serialValue: function (value) {
-    if (typeof value === 'string') {
-      return value;
-    } else {
-      return JSON.stringify(value);
-    }
-  },
-  retrieve: function (key, callback, defaultValue) {
-    if (this.supported) {
-      var value = localStorage['who_is.' + key];
-      if (value) {
-        callback(this._parseValue(value));
-        return;
-      }
-    }
-    if (defaultValue) {
-      callback(defaultValue);
-    }
-  },
-  store: function (key, value) {
-    if (this.supported) {
-      localStorage['who_is.' + key] = this._serialValue(value);
-    }
-  },
-  remove: function (key) {
-    if (this.supported) {
-      localStorage.removeItem(['who_is.' + key]);
-    }
-  },
-  supported: (function () {
-    try {
-      return 'localStorage' in window && window['localStorage'] !== null;
-    } catch (e) {
-      return false;
-    }
-  }())
 };
 
 function addPerson(person) {
@@ -376,31 +323,6 @@ function parseTextarea () {
     }
   }));
 }
-
-// Ripped from the example at http://twitter.github.io/typeahead.js/examples/
-var substringMatcher = function(strs) {
-  return function findMatches(q, cb) {
-    var matches, substrRegex;
-
-    // an array that will be populated with substring matches
-    matches = [];
-
-    // regex used to determine if a string contains the substring `q`
-    substrRegex = new RegExp(quote_for_regexp(q), 'i');
-
-    // iterate through the pool of strings and for any string that
-    // contains the substring `q`, add it to the `matches` array
-    $.each(strs, function(i, str) {
-      if (substrRegex.test(str)) {
-        // the typeahead jQuery plugin expects suggestions to a
-        // JavaScript object, refer to typeahead docs for more info
-        matches.push({ value: str });
-      }
-    });
-
-    cb(matches);
-  };
-};
 
 $(document).ready(function () {
   storage.retrieve('difficulty', function (value) {
