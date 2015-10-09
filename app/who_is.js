@@ -1,73 +1,10 @@
 import storage from './modules/storage';
 import {randInt} from './modules/random';
 import substringMatcher from './modules/substring_matcher';
+import KEYS from './modules/keys';
+import game from './modules/game';
+import people from './modules/people';
 import './modules/monkeypatches';
-
-var KEYS = {
-  W: 87,
-  A: 65,
-  S: 83,
-  UP: 38,
-  RIGHT: 39,
-  DOWN: 40,
-  ESC: 27
-};
-
-var game = {
-  playing: false,
-  score: 0,
-  wrong: 0,
-  guesses: 0,
-  failures: [],
-  difficulty: 'easy',
-  percentage: function () {
-    if (this.score === this.guesses) {
-      return 100;
-    } else {
-      var pct = (this.score / this.guesses) * 100;
-      return pct.toFixed();
-    }
-  },
-  personRenderOptions: function () {
-    if (this.difficulty == 'easy') {
-      return {showChoiceButtons: true};
-    }
-    if (this.difficulty == 'medium') {
-      return {showTypeahead: true};
-    }
-    if (this.difficulty.match(/^hard/)) {
-      return {showTextInput: true};
-    }
-    if (this.difficulty == 'reverse') {
-      return {showChoiceImages: true};
-    }
-  }
-};
-
-var people = {
-  currentPersonIndex: null,
-  allPeople: [],
-  currentPeople: [],
-  personMatching: function (guess) {
-    return this.allPeople.filter(function (person) { return person.name.toLowerCase() == guess.toLowerCase(); })[0];
-  },
-  randomPerson: function () {
-    var personIx = randInt(this.allPeople.length);
-    return this.allPeople[personIx];
-  },
-  currentPerson: function () {
-    return this.currentPeople[this.currentPersonIndex];
-  },
-  chooseNewPerson: function () {
-    this.currentPersonIndex = randInt(this.currentPeople.length);;
-    return this.currentPerson();
-  },
-  guessedPercentage: function () {
-    var guessed = this.allPeople.length - this.currentPeople.length;
-    var pct = (guessed / this.allPeople.length) * 100;
-    return pct.toFixed();
-  }
-};
 
 function addPerson(person) {
   var personToRender = addChoices(person);
@@ -245,19 +182,8 @@ function processGuess(guess) {
 
 function persistState () {
   storage.store('saved_state', {
-    people: {
-      allPeople: _.map(people.allPeople, function (person) {
-        return {name: person.name, photo: person.photo};
-      }),
-      currentPeopleNames: _.pluck(people.currentPeople, 'name')
-    },
-    game: {
-      score: game.score,
-      wrong: game.wrong,
-      guesses: game.guesses,
-      failures: game.failures,
-      difficulty: game.difficulty
-    }
+    people: people.persistedData(),
+    game: game.persistedData()
   });
 }
 

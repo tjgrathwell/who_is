@@ -1,23 +1,25 @@
+function parseValue (value) {
+  if (value && _.include(['[', '{'], value[0])) {
+    return JSON.parse(value);
+  } else {
+    return value;
+  }
+}
+
+function serialValue (value) {
+  if (typeof value === 'string') {
+    return value;
+  } else {
+    return JSON.stringify(value);
+  }
+}
+
 export default {
-  _parseValue: function (value) {
-    if (value && _.include(['[', '{'], value[0])) {
-      return JSON.parse(value);
-    } else {
-      return value;
-    }
-  },
-  _serialValue: function (value) {
-    if (typeof value === 'string') {
-      return value;
-    } else {
-      return JSON.stringify(value);
-    }
-  },
   retrieve: function (key, callback, defaultValue) {
     if (this.supported) {
       var value = localStorage['who_is.' + key];
       if (value) {
-        callback(this._parseValue(value));
+        callback(parseValue(value));
         return;
       }
     }
@@ -27,7 +29,7 @@ export default {
   },
   store: function (key, value) {
     if (this.supported) {
-      localStorage['who_is.' + key] = this._serialValue(value);
+      localStorage['who_is.' + key] = serialValue(value);
     }
   },
   remove: function (key) {
