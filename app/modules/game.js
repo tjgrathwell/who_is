@@ -27,13 +27,13 @@ export default {
       return {showChoiceImages: true};
     }
   },
+  resetScore: function () {
+    this.score = 0;
+    this.wrong = 0;
+    this.guesses = 0;
+    this.failures = [];
+  },
   persistedData: function () {
-    return {
-      score: this.score,
-      wrong: this.wrong,
-      guesses: this.guesses,
-      failures: this.failures,
-      difficulty: this.difficulty
-    };
+    return _.pick(this, 'score', 'wrong', 'guesses', 'failures', 'difficulty');
   }
 }

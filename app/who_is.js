@@ -1,4 +1,5 @@
 import storage from './modules/storage';
+import {strip} from './modules/strings';
 import {randInt} from './modules/random';
 import substringMatcher from './modules/substring_matcher';
 import KEYS from './modules/keys';
@@ -216,10 +217,7 @@ function setGameVisibility(playing, resuming) {
 }
 
 function startGuessing() {
-  game.score = 0;
-  game.wrong = 0;
-  game.guesses = 0;
-  game.failures = [];
+  game.resetScore();
 
   setGameVisibility(true);
 
@@ -232,10 +230,6 @@ function startGuessing() {
 
 function showMainContainer () {
   $('.game-container').css('visibility', 'visible');
-}
-
-function strip(str) {
-  return str.replace(/^\s*(.*?)\s*$/, "$1");
 }
 
 function parseTextarea () {
@@ -307,11 +301,18 @@ $(document).ready(function () {
   key_choices[KEYS.RIGHT] = 3;
   key_choices[KEYS.DOWN] = 5;
 
-  $(document).on('keyup', function (event) {
-    if (!game.playing) {
+  $(document).on('keydown', function (event) {
+    if (!(game.playing && game.difficulty == 'easy')) {
       return;
     }
-    if (game.difficulty != 'easy') {
+
+    if (event.which == KEYS.DOWN || event.which == KEYS.UP) {
+      event.preventDefault();
+    }
+  });
+
+  $(document).on('keyup', function (event) {
+    if (!(game.playing && game.difficulty == 'easy')) {
       return;
     }
 
