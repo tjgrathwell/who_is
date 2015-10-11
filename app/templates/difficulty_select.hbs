@@ -1,8 +1,10 @@
 <label class="difficulty-select">
   Difficulty:
   <select class="difficulty pull-right form-control">
-    {{#each difficulties}}
-      <option value="{{this.value}}">{{this.name}}</option>
-    {{/each}}
+    {{#select selectedDifficulty}}
+      {{#each difficulties}}
+        <option value="{{this.value}}">{{this.name}}</option>
+      {{/each}}
+    {{/select}}
   </select>
 </label>

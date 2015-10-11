@@ -6,6 +6,7 @@ import {isScrollKey, KeyCodes, personIndexForKey} from './modules/keys';
 import game from './modules/game';
 import people from './modules/people';
 import './modules/monkeypatches';
+import './modules/handlebars_helpers';
 
 function addPerson(person) {
   var personToRender = addChoices(person);
@@ -249,15 +250,14 @@ $(document).ready(function () {
     game.difficulty = value;
   }, 'easy');
 
-  var difficultyContext = {
+  $('.difficulty-select-container').append(templates.difficulty_select({
     difficulties: _.map([
       'easy', 'medium', 'hard', 'hardest', 'reverse'
     ], function (level) {
       return {name: level.toTitleCase(), value: level};
-    })
-  };
-  $('.difficulty-select-container').append(templates.difficulty_select(difficultyContext));
-  $('select.difficulty').val(game.difficulty);
+    }),
+    selectedDifficulty: game.difficulty
+  }));
 
   function startGameWithPeople(thesePeople, savedName) {
     people.allPeople = _.uniq(thesePeople, function (p) { return p.name; });
