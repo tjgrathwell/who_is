@@ -2,7 +2,7 @@ import storage from './modules/storage';
 import {strip} from './modules/strings';
 import {randInt} from './modules/random';
 import substringMatcher from './modules/substring_matcher';
-import KEYS from './modules/keys';
+import {isScrollKey, KeyCodes, personIndexForKey} from './modules/keys';
 import game from './modules/game';
 import people from './modules/people';
 import './modules/monkeypatches';
@@ -22,7 +22,7 @@ function addPerson(person) {
   });
 
   function skipPersonOnEsc (e) {
-    if (e.which == KEYS.ESC) {
+    if (e.which == KeyCodes.ESC) {
       processGuess(null);
     }
   }
@@ -289,24 +289,12 @@ $(document).ready(function () {
     startGuessing();
   });
 
-  //  0/W    1/^
-  //  2/A    3/>
-  //  4/S    5/v
-
-  var key_choices = {};
-  key_choices[KEYS.W] = 0;
-  key_choices[KEYS.A] = 2;
-  key_choices[KEYS.S] = 4;
-  key_choices[KEYS.UP] = 1;
-  key_choices[KEYS.RIGHT] = 3;
-  key_choices[KEYS.DOWN] = 5;
-
   $(document).on('keydown', function (event) {
     if (!(game.playing && game.difficulty == 'easy')) {
       return;
     }
 
-    if (event.which == KEYS.DOWN || event.which == KEYS.UP) {
+    if (isScrollKey(event.which)) {
       event.preventDefault();
     }
   });
@@ -316,7 +304,7 @@ $(document).ready(function () {
       return;
     }
 
-    var choiceIx = key_choices[event.which];
+    var choiceIx = personIndexForKey(event.which);
     if (choiceIx !== undefined) {
       var choicePerson = people.currentPerson().choices[choiceIx];
       processGuess(choicePerson.name);
@@ -324,7 +312,7 @@ $(document).ready(function () {
   });
 
   $(document).on('keyup', '.answer input', function (event) {
-    if (event.which === 13) {
+    if (event.which === KeyCodes.RETURN) {
       var guess = $(this).val();
       var validPerson = people.personMatching(guess);
       if (game.difficulty.match(/^hard/) || (game.difficulty == 'medium' && validPerson)) {
