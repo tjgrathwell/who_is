@@ -245,7 +245,9 @@ function parseTextarea () {
   }));
 }
 
-$(document).ready(function () {
+export default function start (selector) {
+  $(selector).html(templates.main());
+
   storage.retrieve('difficulty', function (value) {
     game.difficulty = value;
   }, 'easy');
@@ -277,7 +279,7 @@ $(document).ready(function () {
   });
 
   $(document).on('change', 'select.difficulty', function () {
-    game.difficulty = $('select.difficulty').val();
+    game.difficulty = this.value;
     storage.store('difficulty', game.difficulty);
 
     if (game.playing) {
@@ -420,4 +422,4 @@ $(document).ready(function () {
 
     showMainContainer();
   }, {});
-});
+}
