@@ -246,7 +246,8 @@ function parseTextarea () {
 }
 
 export default function start (selector) {
-  $(selector).html(templates.main());
+  var gameContainer = $(selector);
+  gameContainer.html(templates.main());
 
   storage.retrieve('difficulty', function (value) {
     game.difficulty = value;
@@ -274,11 +275,11 @@ export default function start (selector) {
     startGuessing();
   }
 
-  $(document).on('click', '.begin-button', function (event) {
+  gameContainer.on('click', '.begin-button', function (event) {
     startGameWithPeople(parseTextarea(), $('.save-as-name').val());
   });
 
-  $(document).on('change', 'select.difficulty', function () {
+  gameContainer.on('change', 'select.difficulty', function () {
     game.difficulty = this.value;
     storage.store('difficulty', game.difficulty);
 
@@ -287,11 +288,11 @@ export default function start (selector) {
     }
   });
 
-  $(document).on('click', '.replay button', function (event) {
+  gameContainer.on('click', '.replay button', function (event) {
     startGuessing();
   });
 
-  $(document).on('keydown', function (event) {
+  gameContainer.on('keydown', function (event) {
     if (!(game.playing && game.difficulty == 'easy')) {
       return;
     }
@@ -301,7 +302,7 @@ export default function start (selector) {
     }
   });
 
-  $(document).on('keyup', function (event) {
+  gameContainer.on('keyup', function (event) {
     if (!(game.playing && game.difficulty == 'easy')) {
       return;
     }
@@ -313,7 +314,7 @@ export default function start (selector) {
     }
   });
 
-  $(document).on('keyup', '.answer input', function (event) {
+  gameContainer.on('keyup', '.answer input', function (event) {
     if (event.which === KeyCodes.RETURN) {
       var guess = $(this).val();
       var validPerson = people.personMatching(guess);
@@ -323,11 +324,11 @@ export default function start (selector) {
     }
   });
 
-  $(document).on('click', '[data-link=restart]', function (event) {
+  gameContainer.on('click', '[data-link=restart]', function (event) {
     setGameVisibility(false);
   });
 
-  $(document).on('click', '[data-link=restart-mistakes]', function (event) {
+  gameContainer.on('click', '[data-link=restart-mistakes]', function (event) {
     var now = new Date();
     var date = [
       now.getFullYear(),
@@ -342,23 +343,23 @@ export default function start (selector) {
     startGameWithPeople(game.failures, 'Mistakes ' + [date, time].join(' '));
   });
 
-  $(document).on('click', 'button.choice', function (event) {
+  gameContainer.on('click', 'button.choice', function (event) {
     var guess = $(this).text();
     processGuess(guess);
   });
 
-  $(document).on('click', '.choice-images img', function (event) {
+  gameContainer.on('click', '.choice-images img', function (event) {
     var guess = $(this).data('name');
     processGuess(guess);
   });
 
-  $(document).on('click', '.start-with-saved', function (event) {
+  gameContainer.on('click', '.start-with-saved', function (event) {
     storage.retrieve('saved_people', function (savedPeople) {
       startGameWithPeople(savedPeople[$(event.target).data('name')], $('.save-as-name').val());
     });
   });
 
-  $(document).on('click', '.rename-saved', function (event) {
+  gameContainer.on('click', '.rename-saved', function (event) {
     var valueToStore = {};
     var oldName = $(event.target).data('name');
     var newName = prompt('Enter new name');
@@ -375,7 +376,7 @@ export default function start (selector) {
     }
   });
 
-  $(document).on('click', '.preview-saved', function (event) {
+  gameContainer.on('click', '.preview-saved', function (event) {
     var name = $(event.target).data('name');
     if (name) {
       storage.retrieve('saved_people', function (savedPeople) {
@@ -384,7 +385,7 @@ export default function start (selector) {
     }
   });
 
-  $(document).on('click', '.clear-saved', function (event) {
+  gameContainer.on('click', '.clear-saved', function (event) {
     var result = confirm('Are you sure?');
     if (!result) {
       return;
