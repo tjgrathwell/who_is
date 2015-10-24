@@ -59,25 +59,57 @@ describe('whois', function() {
     });
 
     describe('during the game', function () {
-      beforeEach(function () {
-        gameContainer.find('.begin-button').click();
-      });
+      describe('in the easy difficulty', function () {
+        var currentImage;
+        beforeEach(function () {
+          gameContainer.find('.difficulty').val('easy').trigger('change');
+          gameContainer.find('.begin-button').click();
+          currentImage = gameContainer.find('.person img').attr('src');
+        });
 
-      describe('when the correct image is selected', function () {
-        it("shows a successful message", function () {
-          var currentImage = gameContainer.find('.person img').attr('src');
-          var correctName = peopleMap[currentImage];
-          gameContainer.find('button:contains("' + correctName + '")').click();
-          expect(gameContainer.find('.game .success').length).toEqual(1);
+        describe('when the correct image is selected', function () {
+          it("shows a successful message", function () {
+            var correctName = peopleMap[currentImage];
+            gameContainer.find('button:contains("' + correctName + '")').click();
+            expect(gameContainer.find('.game .success').length).toEqual(1);
+          });
+        });
+
+        describe('when the wrong image is selected', function () {
+          it("shows a failure message", function () {
+            var incorrectName = peopleMap[_.difference(images, [currentImage])[0]];
+            gameContainer.find('button:contains("' + incorrectName + '")').click();
+            expect(gameContainer.find('.game .failure').length).toEqual(1);
+          });
         });
       });
 
-      describe('when the wrong image is selected', function () {
-        it("shows a failure message", function () {
-          var currentImage = gameContainer.find('.person img').attr('src');
-          var incorrectName = peopleMap[_.difference(images, [currentImage])[0]];
-          gameContainer.find('button:contains("' + incorrectName + '")').click();
-          expect(gameContainer.find('.game .failure').length).toEqual(1);
+      describe('in the medium difficulty', function () {
+        var currentImage;
+        var returnKeyEvent;
+        beforeEach(function () {
+          returnKeyEvent = jQuery.Event("keyup");
+          returnKeyEvent.which = 13; // Return Key
+
+          gameContainer.find('.difficulty').val('medium').trigger('change');
+          gameContainer.find('.begin-button').click();
+          currentImage = gameContainer.find('.person img').attr('src');
+        });
+
+        describe('when the correct name is selected', function () {
+          it("shows a successful message", function () {
+            var correctName = peopleMap[currentImage];
+            gameContainer.find('.typeahead').val(correctName).trigger(returnKeyEvent);
+            expect(gameContainer.find('.game .success').length).toEqual(1);
+          });
+        });
+
+        describe('when the wrong name is selected', function () {
+          it("shows a failure message", function () {
+            var incorrectName = peopleMap[_.difference(images, [currentImage])[0]];
+            gameContainer.find('.typeahead').val(incorrectName).trigger(returnKeyEvent);
+            expect(gameContainer.find('.game .failure').length).toEqual(1);
+          });
         });
       });
     });
