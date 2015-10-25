@@ -5,7 +5,17 @@ module.exports = function(config) {
     babelPreprocessor: {
       options: {
         moduleIds: true,
-        modules: 'amd'
+        modules: 'amd',
+        getModuleId: function (moduleName) {
+          // TODO: i'm sure there's some method whereby all this is not necessary
+          if (moduleName.match(/who_is$/)) {
+            return 'who_is';
+          }
+          var moduleFileMatch = moduleName.match(/modules\/(\w+)$/);
+          if (moduleFileMatch) {
+            return './modules/' + moduleFileMatch[1];
+          }
+        }
       }
     },
     handlebarsPreprocessor: {

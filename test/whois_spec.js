@@ -8,7 +8,7 @@ describe('whois', function() {
       return;
     }
 
-    require(['/Users/tjgrathwell/workspace/who_is/app/who_is'], function (_start_) {
+    require(['who_is'], function (_start_) {
       start = _start_;
       done();
     });
@@ -86,11 +86,14 @@ describe('whois', function() {
 
       describe('in the medium difficulty', function () {
         var currentImage;
-        var returnKeyEvent;
-        beforeEach(function () {
-          returnKeyEvent = jQuery.Event("keyup");
-          returnKeyEvent.which = 13; // Return Key
 
+        function keyEvent (eventName, keyCode) {
+          var event = jQuery.Event(eventName);
+          event.which = keyCode; // Return Key
+          return event;
+        }
+
+        beforeEach(function () {
           gameContainer.find('.difficulty').val('medium').trigger('change');
           gameContainer.find('.begin-button').click();
           currentImage = gameContainer.find('.person img').attr('src');
@@ -99,7 +102,7 @@ describe('whois', function() {
         describe('when the correct name is selected', function () {
           it("shows a successful message", function () {
             var correctName = peopleMap[currentImage];
-            gameContainer.find('.typeahead').val(correctName).trigger(returnKeyEvent);
+            gameContainer.find('.typeahead').val(correctName).trigger(keyEvent('keyup', 13));
             expect(gameContainer.find('.game .success').length).toEqual(1);
           });
         });
@@ -107,7 +110,30 @@ describe('whois', function() {
         describe('when the wrong name is selected', function () {
           it("shows a failure message", function () {
             var incorrectName = peopleMap[_.difference(images, [currentImage])[0]];
-            gameContainer.find('.typeahead').val(incorrectName).trigger(returnKeyEvent);
+            gameContainer.find('.typeahead').val(incorrectName).trigger(keyEvent('keyup', 13));
+            expect(gameContainer.find('.game .failure').length).toEqual(1);
+          });
+        });
+      });
+
+      describe('in the reverse difficulty', function () {
+        var currentName;
+        beforeEach(function () {
+          gameContainer.find('.difficulty').val('reverse').trigger('change');
+          gameContainer.find('.begin-button').click();
+          currentName = gameContainer.find('.person .person-name').text();
+        });
+
+        describe('when the correct name is selected', function () {
+          it("shows a successful message", function () {
+            gameContainer.find('.choice-images img[data-name="' + currentName + '"]').click();
+            expect(gameContainer.find('.game .success').length).toEqual(1);
+          });
+        });
+
+        describe('when the wrong name is selected', function () {
+          it("shows a failure message", function () {
+            gameContainer.find('.choice-images [data-name]').filter('[data-name!="' + currentName + '"]').click();
             expect(gameContainer.find('.game .failure').length).toEqual(1);
           });
         });
