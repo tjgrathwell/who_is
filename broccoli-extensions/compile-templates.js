@@ -2,6 +2,8 @@
 
 var jsStringEscape = require('js-string-escape')
 var Filter = require('broccoli-filter')
+var fs = require('fs')
+var path = require('path')
 
 module.exports = TemplateFilter
 TemplateFilter.prototype = Object.create(Filter.prototype)
@@ -13,15 +15,20 @@ function TemplateFilter (inputNode, options) {
 
   this.extensions = options.extensions
   this.compileFunction = options.compileFunction || ''
+  this.templateLocation = options.templateLocation
 }
 
 TemplateFilter.prototype.targetExtension = 'js'
 
 TemplateFilter.prototype.processString = function (string, path) {
   var templateName = path.match(/(\w+)\.hbs/)[1];
-  var templateLoadLines = [];
-  templateLoadLines.push('window.templates = window.templates || {};');
-  templateLoadLines.push('templates[\'' + templateName + '\'] = ' + this.compileFunction +
-  '("' + jsStringEscape(string) + '");');
-  return templateLoadLines.join("\n");
+  return `${this.templateLocation}['${templateName}'] = ${this.compileFunction}("${jsStringEscape(string)}")`
+}
+
+TemplateFilter.prototype.build = function () {
+  fs.writeFileSync(
+    path.join(this.outputPath, 'template_preamble.js'),
+    `${this.templateLocation} = {}`
+  )
+  return Filter.prototype.build.call(this)
 }
