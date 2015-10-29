@@ -1,18 +1,7 @@
-describe('whois', function() {
+import start from 'who_is';
+
+describe('who_is', function() {
   var gameContainer;
-  var start;
-
-  beforeEach(function (done) {
-    if (start) {
-      done();
-      return;
-    }
-
-    require(['who_is'], function (_start_) {
-      start = _start_;
-      done();
-    });
-  });
 
   beforeEach(function () {
     if (!gameContainer) {
@@ -70,7 +59,7 @@ describe('whois', function() {
         describe('when the correct image is selected', function () {
           it("shows a successful message", function () {
             var correctName = peopleMap[currentImage];
-            gameContainer.find('button:contains("' + correctName + '")').click();
+            gameContainer.find(`button:contains("${correctName}")`).click();
             expect(gameContainer.find('.game .success').length).toEqual(1);
           });
         });
@@ -78,7 +67,7 @@ describe('whois', function() {
         describe('when the wrong image is selected', function () {
           it("shows a failure message", function () {
             var incorrectName = peopleMap[_.difference(images, [currentImage])[0]];
-            gameContainer.find('button:contains("' + incorrectName + '")').click();
+            gameContainer.find(`button:contains("${incorrectName}")`).click();
             expect(gameContainer.find('.game .failure').length).toEqual(1);
           });
         });
@@ -126,14 +115,14 @@ describe('whois', function() {
 
         describe('when the correct name is selected', function () {
           it("shows a successful message", function () {
-            gameContainer.find('.choice-images img[data-name="' + currentName + '"]').click();
+            gameContainer.find(`.choice-images img[data-name="${currentName}"]`).click();
             expect(gameContainer.find('.game .success').length).toEqual(1);
           });
         });
 
         describe('when the wrong name is selected', function () {
           it("shows a failure message", function () {
-            gameContainer.find('.choice-images [data-name]').filter('[data-name!="' + currentName + '"]').click();
+            gameContainer.find('.choice-images [data-name]').filter(`[data-name!="${currentName}"]`).click();
             expect(gameContainer.find('.game .failure').length).toEqual(1);
           });
         });

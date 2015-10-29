@@ -15,6 +15,10 @@ module.exports = function(config) {
           if (moduleFileMatch) {
             return './modules/' + moduleFileMatch[1];
           }
+          var specFileMatch = moduleName.match(/test\/(\w+)$/);
+          if (specFileMatch) {
+            return 'test/' + specFileMatch[1];
+          }
         }
       }
     },
@@ -23,7 +27,8 @@ module.exports = function(config) {
     },
     preprocessors: {
       'app/**/*.js': ['babel'],
-      'app/templates/**/*.hbs': 'handlebars'
+      'app/templates/**/*.hbs': 'handlebars',
+      'test/**/*_spec.js': ['babel']
     },
     files: [
       'http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.20/require.min.js',
@@ -31,9 +36,12 @@ module.exports = function(config) {
       'http://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.4/typeahead.jquery.min.js',
       'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js',
       'http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js',
+      'node_modules/requirejs/require.js',
+      'node_modules/karma-requirejs/lib/adapter.js',
       'app/templates/*.hbs',
       'app/**/*.js',
-      'test/*_spec.js'
+      'test/*_spec.js',
+      'test/test-main.js'
     ]
   });
 };
