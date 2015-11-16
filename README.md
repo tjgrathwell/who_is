@@ -18,6 +18,12 @@ http://tjgrathwell.github.io/who_is
 
 ## Testing
 
-`./node_modules/karma/bin/karma start`
+### Automatic
+
+`npm test`
+
+### Manual
+
+Start the server with `./node_modules/karma/bin/karma start`
 
 Visit `http://localhost:9876/` in your browser.

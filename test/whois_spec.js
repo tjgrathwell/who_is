@@ -65,10 +65,22 @@ describe('who_is', function() {
         });
 
         describe('when the wrong image is selected', function () {
-          it("shows a failure message", function () {
-            var incorrectName = peopleMap[_.difference(images, [currentImage])[0]];
+          var incorrectName;
+          beforeEach(function () {
+            incorrectName = peopleMap[_.difference(images, [currentImage])[0]];
             gameContainer.find(`button:contains("${incorrectName}")`).click();
+          });
+
+          it("shows a failure message", function () {
             expect(gameContainer.find('.game .failure').length).toEqual(1);
+          });
+
+          it('adds the incorrectly guessed person to the mistakes area', function () {
+            var failureNames = _.map(gameContainer.find('.failures img'), function (image) {
+              return $(image).attr('title');
+            });
+            var correctName = peopleMap[currentImage];
+            expect(failureNames).toEqual([correctName]);
           });
         });
       });

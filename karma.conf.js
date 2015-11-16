@@ -31,11 +31,11 @@ module.exports = function(config) {
       'test/**/*_spec.js': ['babel']
     },
     files: [
+      'http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js',
+      'http://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.jquery.min.js',
+      'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js',
+      'http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.4/handlebars.min.js',
       'http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.20/require.min.js',
-      'http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js',
-      'http://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.4/typeahead.jquery.min.js',
-      'http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js',
-      'http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js',
       'node_modules/requirejs/require.js',
       'node_modules/karma-requirejs/lib/adapter.js',
       'app/templates/*.hbs',
