@@ -14,7 +14,8 @@ function TemplateFilter (inputNode, options) {
   Filter.call(this, inputNode, options)
 
   this.extensions = options.extensions
-  this.compileFunction = options.compileFunction || ''
+  this.compiler = options.compiler
+  this.hydrateFunction = options.hydrateFunction
   this.templateLocation = options.templateLocation
 }
 
@@ -22,7 +23,7 @@ TemplateFilter.prototype.targetExtension = 'js'
 
 TemplateFilter.prototype.processString = function (string, path) {
   var templateName = path.match(/(\w+)\.hbs/)[1];
-  return `${this.templateLocation}['${templateName}'] = ${this.compileFunction}("${jsStringEscape(string)}")`
+  return `${this.templateLocation}['${templateName}'] = ${this.hydrateFunction}(${this.compiler(string)})`
 }
 
 TemplateFilter.prototype.build = function () {

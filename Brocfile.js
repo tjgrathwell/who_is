@@ -4,13 +4,15 @@ var filterTemplates = require('./broccoli-extensions/compile-templates');
 var concatFiles = require('broccoli-concat');
 var babel = require('broccoli-babel-transpiler');
 var funnel = require('broccoli-funnel');
+var handlebars = require('handlebars');
 
 var appCss = compileSass(['app'], 'styles/main.scss', 'assets/who_is.css');
 
 var templates = filterTemplates('app', {
   extensions: ['hbs'],
   templateLocation: 'window.templates',
-  compileFunction: 'Handlebars.compile'
+  compiler: handlebars.precompile,
+  hydrateFunction: 'Handlebars.template'
 });
 
 var appJs = babel('app', {
