@@ -2,6 +2,10 @@ module.exports = function(config) {
   config.set({
     basePath: '.',
     frameworks: ['jasmine'],
+    reporters: 'jasmine-diff',
+    jasmineDiffReporter: {
+      pretty: true
+    },
     babelPreprocessor: {
       options: {
         moduleIds: true,

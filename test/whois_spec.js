@@ -47,6 +47,14 @@ describe('who_is', function() {
       expect(_.include(images, currentImage)).toBeTruthy();
     });
 
+    it('shows a randomly shuffled list of options', function () {
+      gameContainer.find('.begin-button').click();
+
+      var buttons = gameContainer.find('.answer .choice');
+      var names = buttons.map(function (ix, button) { return $(button).text() }).toArray();
+      expect(names.sort()).toEqual([ 'Bill Murray', 'Nicolas Cage', 'A Bear' ].sort())
+    });
+
     describe('during the game', function () {
       describe('in the easy difficulty', function () {
         var currentImage;
