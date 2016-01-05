@@ -37,6 +37,17 @@ export default {
       localStorage.removeItem(['who_is.' + key]);
     }
   },
+  clearAll: function () {
+    if (this.supported) {
+      var i = localStorage.length;
+      while(i--) {
+        var key = localStorage.key(i);
+        if(/^who_is\./.test(key)) {
+          localStorage.removeItem(key);
+        }
+      }
+    }
+  },
   supported: (function () {
     try {
       return 'localStorage' in window && window['localStorage'] !== null;

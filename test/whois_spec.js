@@ -1,9 +1,12 @@
 import start from 'who_is';
+import storage from 'modules/storage';
 
 describe('who_is', function() {
   var gameContainer;
 
   beforeEach(function () {
+    storage.clearAll();
+
     if (!gameContainer) {
       $('body').append('<div class="game-container"></div>');
       gameContainer = $('.game-container');
