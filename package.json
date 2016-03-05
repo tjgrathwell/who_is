@@ -25,7 +25,8 @@
     "requirejs": "2.1.22"
   },
   "scripts": {
-    "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS"
+    "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS",
+    "test-server": "./node_modules/.bin/karma start"
   },
   "repository": {
     "type": "git",

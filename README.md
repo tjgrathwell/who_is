@@ -24,6 +24,6 @@ http://tjgrathwell.github.io/who_is
 
 ### Manual
 
-Start the server with `./node_modules/karma/bin/karma start`
+Start the server with `npm run-script test-server`
 
 Visit `http://localhost:9876/` in your browser.
