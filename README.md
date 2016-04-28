@@ -27,3 +27,9 @@ http://tjgrathwell.github.io/who_is
 Start the server with `npm run-script test-server`
 
 Visit `http://localhost:9876/` in your browser.
+
+### Focused
+
+You can run just the tests defined at a particular line number like so:
+
+TEST_PATH=/absolute/path/to/test_file.js TEST_LINE=22 npm test

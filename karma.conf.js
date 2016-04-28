@@ -1,5 +1,7 @@
+var fs = require('fs');
+
 module.exports = function(config) {
-  config.set({
+  var options = {
     basePath: '.',
     frameworks: ['jasmine'],
     reporters: ['jasmine-diff', 'progress'],
@@ -45,7 +47,64 @@ module.exports = function(config) {
       'app/templates/*.hbs',
       'app/**/*.js',
       'test/*_spec.js',
-      'test/test-main.js'
-    ]
-  });
+      'test/test-main.js',
+      'test/helpers/*.js'
+    ],
+    plugins: config.plugins
+  };
+
+  if (process.env.TEST_PATH && process.env.TEST_LINE) {
+    options.middleware = ['test-filter-relay'];
+    options.preprocessors['test/helpers/test-filter.js'] = ['test-filter'];
+    options.plugins.push({
+      'preprocessor:test-filter': ['factory', TestFilterPreprocessorFactory],
+      'middleware:test-filter-relay': ['factory', TestFilterRelayFactory]
+    });
+  }
+
+  config.set(options);
 };
+
+function TestFilterPreprocessorFactory () {
+  return function (content, file, done) {
+    done(content.replace(/window\.focusedTestFileURL/g, '"/focused_test_name.txt"'));
+  };
+}
+
+function TestFilterRelayFactory () {
+  return function (request, response, next) {
+    if (request.url === '/focused_test_name.txt') {
+      var name = testNameAtFileLine(process.env.TEST_PATH, process.env.TEST_LINE);
+
+      response.writeHead(200);
+      response.end(name);
+    } else {
+      return next();
+    }
+  };
+}
+
+function testNameAtFileLine(filePath, lineNumber) {
+  var lines = fs.readFileSync(filePath, 'UTF-8').trim().split("\n");
+  var currentIndentLevel = 99999;
+  var linePointer = parseInt(lineNumber, 10) - 1;
+  var match;
+  var lineRegexp = /^(\s*)f?(?:it|describe)\s*\(\s*(['"])(.*?)\2/;
+  var nameComponents = [];
+
+  while (linePointer >= 0) {
+    var line = lines[linePointer];
+
+    if (match = line.match(lineRegexp)) {
+      var indentLevel = match[1];
+      var nameComponent = match[3];
+      if (indentLevel < currentIndentLevel) {
+        nameComponents.push(nameComponent);
+        currentIndentLevel = indentLevel;
+      }
+    }
+    linePointer -= 1;
+  }
+
+  return nameComponents.reverse().join(' ');
+}
