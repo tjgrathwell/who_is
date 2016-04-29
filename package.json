@@ -13,16 +13,16 @@
     "handlebars": "4.0.5",
     "jasmine-core": "2.4.1",
     "js-string-escape": "^1.0.0",
-    "karma": "0.13.21",
+    "karma": "0.13.22",
     "karma-babel-preprocessor": "5.2.2",
-    "karma-chrome-launcher": "0.2.2",
+    "karma-chrome-launcher": "0.2.3",
     "karma-handlebars-preprocessor": "^0.3.0",
-    "karma-jasmine": "0.3.7",
+    "karma-jasmine": "0.3.8",
     "karma-jasmine-diff-reporter": "0.3.4",
     "karma-phantomjs-launcher": "1.0.0",
-    "karma-requirejs": "0.2.5",
-    "phantomjs-prebuilt": "2.1.4",
-    "requirejs": "2.1.22"
+    "karma-requirejs": "0.2.6",
+    "phantomjs-prebuilt": "2.1.7",
+    "requirejs": "2.2.0"
   },
   "scripts": {
     "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS",
