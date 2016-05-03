@@ -50,28 +50,24 @@ module.exports = function(config) {
     plugins: config.plugins
   };
 
-  if (process.env.TEST_PATH && process.env.TEST_LINE) {
-    options.middleware = ['test-filter-relay'];
-    options.preprocessors['test/helpers/test-filter.js'] = ['test-filter'];
-    options.plugins.push({
-      'preprocessor:test-filter': ['factory', TestFilterPreprocessorFactory],
-      'middleware:test-filter-relay': ['factory', TestFilterRelayFactory]
-    });
-  }
+  // Test focusing
+  options.middleware = ['test-filter-relay'];
+  options.plugins.push({
+    'middleware:test-filter-relay': ['factory', TestFilterRelayFactory]
+  });
 
   config.set(options);
 };
 
-function TestFilterPreprocessorFactory () {
-  return function (content, file, done) {
-    done(content.replace(/window\.focusedTestFileURL/g, '"/focused_test_name.txt"'));
-  };
-}
-
 function TestFilterRelayFactory () {
   return function (request, response, next) {
-    if (request.url === '/focused_test_name.txt') {
-      var name = testNameAtFileLine(process.env.TEST_PATH, process.env.TEST_LINE);
+    var match = request.url.match(new RegExp('^/focused_test_name/(.*)'));
+    if (match) {
+      var pathAndLine = decodeURIComponent(match[1]).split(':');
+      var path = pathAndLine[0];
+      var line = pathAndLine[1];
+      var name = testNameAtFileLine(path, line);
+      console.log("Focus:", match[1], '(' + name + ')');
 
       response.writeHead(200);
       response.end(name);

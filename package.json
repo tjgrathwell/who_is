@@ -31,7 +31,8 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS",
-    "test-server": "./node_modules/.bin/karma start"
+    "test-server": "./node_modules/.bin/karma start",
+    "test-run": "./node_modules/.bin/karma run --"
   },
   "repository": {
     "type": "git",

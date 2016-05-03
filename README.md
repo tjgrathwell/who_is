@@ -32,4 +32,5 @@ Visit `http://localhost:9876/` in your browser.
 
 You can run just the tests defined at a particular line number like so:
 
-TEST_PATH=/absolute/path/to/test_file.js TEST_LINE=22 npm test
+`npm run test-server` to start the server
+`npm run test-run -- /absolute/path/to/test_file.js:22`
