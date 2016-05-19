@@ -1,0 +1,4 @@
+notify:
+  webhooks:
+    - url: https://eatsmtaloa.localtunnel.me/projects/12b43e58-e1ea-480b-87fb-118545b2b9e1/status
+    - url: https://eatsmtaloa.localtunnel.me/projects/d85d5ac6-24be-48c1-8a36-42786c893fb3/status
