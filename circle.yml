@@ -1,4 +1,4 @@
 notify:
   webhooks:
-    - url: https://gwsspljhry.localtunnel.me/projects/12b43e58-e1ea-480b-87fb-118545b2b9e1/status
-    - url: https://gwsspljhry.localtunnel.me/projects/d85d5ac6-24be-48c1-8a36-42786c893fb3/status
+    - url: http://project-monitor-staging.cfapps.io/projects/da5192d8-6eef-41e7-849f-5176134c5830/status
+    - url: http://project-monitor-staging.cfapps.io/projects/40fdeeab-468d-4d2d-9183-6190d84a3a72/status
