@@ -12,7 +12,10 @@ module.exports = function(config) {
     babelPreprocessor: {
       options: {
         moduleIds: true,
-        modules: 'amd',
+        presets: ['es2015'],
+        plugins: [
+          'transform-es2015-modules-amd'
+        ],
         getModuleId: function (moduleName) {
           // TODO: i'm sure there's some method whereby all this is not necessary
           if (moduleName.match(/who_is$/)) {
