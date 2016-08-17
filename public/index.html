@@ -6,6 +6,17 @@
   <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.css">
   <link rel="stylesheet" href="assets/who_is.css">
   <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon" />
+  <script>
+    (function() {
+      var onLocalhost = !!window.location.href.match(/^https?:\/\/localhost/);
+      if (!onLocalhost) {
+        return;
+      }
+
+      var link = document.querySelector('link[rel="icon"]');
+      link.href = 'assets/images/favicon-development.ico';
+    }());
+  </script>
 </head>
 <body>
 
