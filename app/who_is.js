@@ -139,7 +139,14 @@ function renderSavedPeople() {
 
 function renderPreview($row, people) {
   $row.after('<tr><td colspan=5 class=saved-preview>' + templates.preview_people({people: people}) + '</td></tr>');
-  $row.find('.preview-saved').hide();
+  $row.find('.preview-saved').addClass('hidden');
+  $row.find('.hide-preview').removeClass('hidden');
+}
+
+function hidePreview($row) {
+  $row.next().remove();
+  $row.find('.preview-saved').removeClass('hidden');
+  $row.find('.hide-preview').addClass('hidden');
 }
 
 function processGuess(guess) {
@@ -383,6 +390,10 @@ export default function start (selector) {
         renderPreview($(event.target).closest('tr'), savedPeople[name]);
       });
     }
+  });
+
+  gameContainer.on('click', '.hide-preview', function (event) {
+    hidePreview($(event.target).closest('tr'));
   });
 
   gameContainer.on('click', '.clear-saved', function (event) {
