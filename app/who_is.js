@@ -282,6 +282,11 @@ export default function start (selector) {
     startGuessing();
   }
 
+  gameContainer.find('.begin-button').prop('disabled', true);
+  gameContainer.on('input', 'textarea', function (event) {
+    gameContainer.find('.begin-button').prop('disabled', event.target.value.length === 0);
+  });
+
   gameContainer.on('click', '.begin-button', function (event) {
     startGameWithPeople(parseTextarea(), $('.save-as-name').val());
   });

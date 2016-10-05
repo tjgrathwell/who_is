@@ -41,7 +41,7 @@ describe('who_is', function() {
       });
       images = _.keys(peopleMap);
 
-      gameContainer.find('textarea').val(people.join("\n"));
+      gameContainer.find('textarea').val(people.join("\n")).trigger('input');
     });
 
     it('starts the game when the start button is pressed', function () {
