@@ -284,7 +284,8 @@ export default function start (selector) {
 
   gameContainer.find('.begin-button').prop('disabled', true);
   gameContainer.on('input', 'textarea', function (event) {
-    gameContainer.find('.begin-button').prop('disabled', event.target.value.length === 0);
+    var parsedNames = parseTextarea();
+    gameContainer.find('.begin-button').prop('disabled', parsedNames.length === 0);
   });
 
   gameContainer.on('click', '.begin-button', function (event) {
