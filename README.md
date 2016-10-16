@@ -30,7 +30,7 @@ Visit `http://localhost:9876/` in your browser.
 
 ### Focused
 
-You can run just the tests defined at a particular line number like so:
+You can run a focused test or group of tests by passing the name on the command line:
 
 `npm run test-server` to start the server
-`npm run test-run -- /absolute/path/to/test_file.js:22`
+`npm run test-run -- "who_is shows the app title"`

@@ -53,54 +53,5 @@ module.exports = function(config) {
     plugins: config.plugins
   };
 
-  // Test focusing
-  options.middleware = ['test-filter-relay'];
-  options.plugins.push({
-    'middleware:test-filter-relay': ['factory', TestFilterRelayFactory]
-  });
-
   config.set(options);
 };
-
-function TestFilterRelayFactory () {
-  return function (request, response, next) {
-    var match = request.url.match(new RegExp('^/focused_test_name/(.*)'));
-    if (match) {
-      var pathAndLine = decodeURIComponent(match[1]).split(':');
-      var path = pathAndLine[0];
-      var line = pathAndLine[1];
-      var name = testNameAtFileLine(path, line);
-      console.log("Focus:", match[1], '(' + name + ')');
-
-      response.writeHead(200);
-      response.end(name);
-    } else {
-      return next();
-    }
-  };
-}
-
-function testNameAtFileLine(filePath, lineNumber) {
-  var lines = fs.readFileSync(filePath, 'UTF-8').trim().split("\n");
-  var currentIndentLevel = 99999;
-  var linePointer = parseInt(lineNumber, 10) - 1;
-  var match;
-  var lineRegexp = /^(\s*)f?(?:it|describe)\s*\(\s*(['"])(.*?)\2/;
-  var nameComponents = [];
-
-  while (linePointer >= 0) {
-    var line = lines[linePointer];
-
-    if (match = line.match(lineRegexp)) {
-      var indentLevel = match[1];
-      var nameComponent = match[3];
-      if (indentLevel < currentIndentLevel) {
-        nameComponents.push(nameComponent);
-        currentIndentLevel = indentLevel;
-      }
-    }
-    linePointer -= 1;
-  }
-
-  return nameComponents.reverse().join(' ');
-}
