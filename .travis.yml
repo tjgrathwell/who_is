@@ -1,4 +1,8 @@
 language: node_js
 node_js:
-  - 4.2.1
+  - 6
+env:
+  - "PATH=$PWD/node_modules/.bin:$PATH"
+  - "PHANTOMJS_BIN=$PWD/node_modules/.bin/phantomjs"
+cache: yarn
 sudo: false
