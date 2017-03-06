@@ -28,7 +28,7 @@ var appImages = new funnel('app', {
 });
 
 var vendorJs = concatFiles('node_modules', {
-  inputFiles: npmDepsList,
+  headerFiles: npmDepsList,
   outputFile: '/assets/vendor.js'
 });
 
