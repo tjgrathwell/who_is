@@ -8,9 +8,11 @@ import people from './modules/people';
 import './modules/monkeypatches';
 import './modules/handlebars_helpers';
 
+const {includes, compact, uniq, padStart} = _;
+
 function addPerson(person) {
   var personToRender = addChoices(person);
-  renderPerson($('#question'), _.extend({}, personToRender, game.personRenderOptions()));
+  renderPerson($('#question'), Object.assign({}, personToRender, game.personRenderOptions()));
   var typeahead = $('.typeahead').typeahead({
     hint: true,
     highlight: true,
@@ -38,7 +40,7 @@ function addPerson(person) {
 function addChoices (person) {
   function randomChoice(exceptionNames) {
     var randomPerson = people.randomPerson();
-    while (_.include(exceptionNames, randomPerson.name)) {
+    while (includes(exceptionNames, randomPerson.name)) {
       randomPerson = people.randomPerson();
     }
     return randomPerson;
@@ -123,12 +125,13 @@ function renderScore() {
 function renderSavedPeople() {
   storage.retrieve('saved_people', function (savedPeople) {
     var renderData = [];
-    _.each(savedPeople, function (people, name) {
+    for (let name of Object.keys(savedPeople)) {
+      let people = savedPeople[name];
       var sample = people.slice(0, 3).map(function (person) {
         return person.name;
       }).join(', ');
       renderData.push({name: name, count: people.length, sample: sample});
-    });
+    }
     var $el = $('.saved-people');
     $el.empty();
     if (renderData.length > 0) {
@@ -151,7 +154,7 @@ function hidePreview($row) {
 
 function processGuess(guess) {
   var thisPerson = people.currentPerson();
-  _.extend(thisPerson, {
+  Object.assign(thisPerson, {
     guessedCorrectly: false,
     guessedPartially: false
   });
@@ -241,7 +244,7 @@ function showMainContainer () {
 }
 
 function parseTextarea () {
-  return _.compact(_.map($('.entry textarea').val().split("\n"), function (line) {
+  return compact($('.entry textarea').val().split("\n").map(function (line) {
     var match;
     if (match = strip(line).match(/^(http[^ ]+)\s+(.*)/)) {
       return {
@@ -261,16 +264,16 @@ export default function start (selector) {
   }, 'easy');
 
   $('.difficulty-select-container').append(templates.difficulty_select({
-    difficulties: _.map([
+    difficulties: [
       'easy', 'medium', 'hard', 'hardest', 'reverse'
-    ], function (level) {
+    ].map((level) => {
       return {name: level.toTitleCase(), value: level};
     }),
     selectedDifficulty: game.difficulty
   }));
 
   function startGameWithPeople(thesePeople, savedName) {
-    people.allPeople = _.uniq(thesePeople, function (p) { return p.name; });
+    people.allPeople = uniq(thesePeople, function (p) { return p.name; });
     storage.store('people', people.allPeople);
     if (savedName) {
       storage.retrieve('saved_people', function (savedPeople) {
@@ -347,12 +350,12 @@ export default function start (selector) {
       now.getFullYear(),
       (now.getMonth() + 1),
       now.getDate()
-    ].join('-');
+    ].map((part) => padStart(part, 2, '0')).join('-');
 
     var time = [
       now.getHours(),
       now.getMinutes()
-    ].join(':');
+    ].map((part) => padStart(part, 2, '0')).join(':');
     startGameWithPeople(game.failures, 'Mistakes ' + [date, time].join(' '));
   });
 
@@ -421,12 +424,12 @@ export default function start (selector) {
   });
 
   storage.retrieve('saved_state', function (savedState) {
-    if (savedState && _.keys(savedState).length > 0) {
+    if (savedState && Object.keys(savedState).length > 0) {
       people.allPeople = savedState.people.allPeople;
-      people.currentPeople = _.filter(people.allPeople, function (p) {
-        return _.include(savedState.people.currentPeopleNames, p.name);
+      people.currentPeople = people.allPeople.filter(function (p) {
+        return includes(savedState.people.currentPeopleNames, p.name);
       });
-      _.extend(game, savedState.game);
+      Object.assign(game, savedState.game);
 
       setGameVisibility(true, true);
 

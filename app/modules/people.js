@@ -1,5 +1,7 @@
 import {randInt} from './random';
 
+const {map} = _;
+
 export default {
   currentPersonIndex: null,
   allPeople: [],
@@ -25,10 +27,10 @@ export default {
   },
   persistedData: function () {
     return {
-      allPeople: _.map(this.allPeople, function (person) {
+      allPeople: this.allPeople.map((person) => {
         return {name: person.name, photo: person.photo};
       }),
-      currentPeopleNames: _.pluck(this.currentPeople, 'name')
+      currentPeopleNames: map(this.currentPeople, 'name')
     };
   }
 }

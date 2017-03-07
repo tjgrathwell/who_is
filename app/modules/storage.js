@@ -1,5 +1,7 @@
+const {includes} = _;
+
 function parseValue (value) {
-  if (value && _.include(['[', '{'], value[0])) {
+  if (value && includes(['[', '{'], value[0])) {
     return JSON.parse(value);
   } else {
     return value;

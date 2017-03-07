@@ -1,3 +1,5 @@
+const {pick} = _;
+
 export default {
   playing: false,
   score: 0,
@@ -34,6 +36,6 @@ export default {
     this.failures = [];
   },
   persistedData: function () {
-    return _.pick(this, 'score', 'wrong', 'guesses', 'failures', 'difficulty');
+    return pick(this, 'score', 'wrong', 'guesses', 'failures', 'difficulty');
   }
 }

@@ -1,6 +1,8 @@
 import start from 'who_is';
 import storage from 'modules/storage';
 
+const {includes, difference} = _;
+
 describe('who_is', function() {
   var gameContainer;
 
@@ -35,11 +37,11 @@ describe('who_is', function() {
       ];
       peopleMap = {};
 
-      _.each(people, function (p) {
+      people.forEach((p) => {
         var parts = p.match(/([^\s]+) (.*)/);
         peopleMap[parts[1]] = parts[2];
       });
-      images = _.keys(peopleMap);
+      images = Object.keys(peopleMap);
 
       gameContainer.find('textarea').val(people.join("\n")).trigger('input');
     });
@@ -47,7 +49,7 @@ describe('who_is', function() {
     it('starts the game when the start button is pressed', function () {
       gameContainer.find('.begin-button').click();
       var currentImage = gameContainer.find('.person img').attr('src');
-      expect(_.include(images, currentImage)).toBeTruthy();
+      expect(includes(images, currentImage)).toBeTruthy();
     });
 
     it('shows a randomly shuffled list of options', function () {
@@ -78,7 +80,7 @@ describe('who_is', function() {
         describe('when the wrong image is selected', function () {
           var incorrectName;
           beforeEach(function () {
-            incorrectName = peopleMap[_.difference(images, [currentImage])[0]];
+            incorrectName = peopleMap[difference(images, [currentImage])[0]];
             gameContainer.find(`button:contains("${incorrectName}")`).click();
           });
 
@@ -87,7 +89,7 @@ describe('who_is', function() {
           });
 
           it('adds the incorrectly guessed person to the mistakes area', function () {
-            var failureNames = _.map(gameContainer.find('.failures img'), function (image) {
+            var failureNames = gameContainer.find('.failures img').toArray().map((image) => {
               return $(image).attr('title');
             });
             var correctName = peopleMap[currentImage];
@@ -121,7 +123,7 @@ describe('who_is', function() {
 
         describe('when the wrong name is selected', function () {
           it("shows a failure message", function () {
-            var incorrectName = peopleMap[_.difference(images, [currentImage])[0]];
+            var incorrectName = peopleMap[difference(images, [currentImage])[0]];
             gameContainer.find('.typeahead').val(incorrectName).trigger(keyEvent('keyup', 13));
             expect(gameContainer.find('.game .failure').length).toEqual(1);
           });
