@@ -1,5 +1,6 @@
 var fs = require('fs');
 var npmDepsList = require('./npm-deps-list');
+var thisDir = __dirname;
 
 module.exports = function(config) {
   var options = {
@@ -16,19 +17,9 @@ module.exports = function(config) {
         plugins: [
           'transform-es2015-modules-amd'
         ],
-        getModuleId: function (moduleName) {
-          // TODO: i'm sure there's some method whereby all this is not necessary
-          if (moduleName.match(/who_is$/)) {
-            return 'who_is';
-          }
-          var moduleFileMatch = moduleName.match(/modules\/(\w+)$/);
-          if (moduleFileMatch) {
-            return './modules/' + moduleFileMatch[1];
-          }
-          var specFileMatch = moduleName.match(/test\/(\w+)$/);
-          if (specFileMatch) {
-            return 'test/' + specFileMatch[1];
-          }
+        getModuleId: function (fileName) {
+          var relativeName = fileName.replace(thisDir + '/', '');
+          return relativeName.replace(new RegExp('^app/'), '');
         }
       }
     },
