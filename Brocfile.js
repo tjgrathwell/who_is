@@ -19,7 +19,10 @@ var templates = filterTemplates('app', {
 var appJs = babel('app', {
   browserPolyfill: true,
   moduleIds: true,
-  modules: 'amd'
+  presets: ['es2015'],
+  plugins: [
+    'transform-es2015-modules-amd'
+  ]
 });
 
 var appImages = new funnel('app', {

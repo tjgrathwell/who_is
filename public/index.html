@@ -27,9 +27,9 @@
 
 <script>
   // TODO: find some way for app.js to boot itself
-  require(['who_is'], function (start) {
+  require(['who_is'], function (_start) {
     $('document').ready(function () {
-      start('.game-container');
+      _start.default('.game-container');
     });
   });
 </script>
