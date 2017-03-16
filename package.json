@@ -35,6 +35,7 @@
   },
   "scripts": {
     "postinstall": "node node_modules/phantomjs-prebuilt/install.js",
+    "start": "./bin/start-development-server.js serve",
     "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS",
     "test-server": "./node_modules/.bin/karma start",
     "test-run": "./node_modules/.bin/karma run --"
