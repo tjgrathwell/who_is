@@ -2,7 +2,9 @@ git branch -D gh-pages
 
 git checkout -b gh-pages
 
-vite build
+rm .gitignore
+
+npm run build
 
 git add .
 

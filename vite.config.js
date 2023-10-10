@@ -3,6 +3,7 @@ import Handlebars from 'handlebars';
 import './src/modules/handlebars_helpers';
 
 export default defineConfig({
+    base: '',
     plugins: [
         {
             name: 'handlebars',
