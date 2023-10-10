@@ -1,4 +1,4 @@
-const {includes} = _;
+import { includes } from 'lodash';
 
 function parseValue (value) {
   if (value && includes(['[', '{'], value[0])) {

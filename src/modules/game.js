@@ -1,5 +1,4 @@
-const {pick} = _;
-
+import { pick } from 'lodash';
 export default {
   playing: false,
   score: 0,

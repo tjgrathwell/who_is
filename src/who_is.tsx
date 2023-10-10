@@ -6,27 +6,31 @@ import {isScrollKey, KeyCodes, personIndexForKey} from './modules/keys';
 import game from './modules/game';
 import people from './modules/people';
 import './modules/monkeypatches';
-import './modules/handlebars_helpers';
+import templates from './templates';
 
-const {includes, compact, uniq, padStart} = _;
+import { includes, compact, uniq, padStart } from 'lodash';
+// TODO: replace typeahead with something that will load in prod mode
+// import 'typeahead.js'
 
-function addPerson(person) {
+function addPerson($, person) {
   var personToRender = addChoices(person);
   renderPerson($('#question'), Object.assign({}, personToRender, game.personRenderOptions()));
-  var typeahead = $('.typeahead').typeahead({
-    hint: true,
-    highlight: true,
-    autoselect: true,
-    minLength: 1
-  }, {
-    name: 'people',
-    displayKey: 'value',
-    source: substringMatcher(people.allPeople.map(function (person) { return person.name; }))
-  });
+  var typeahead = $('.typeahead');
+  // TODO: replace typeahead with something that will load in prod mode
+  // var typeahead = $('.typeahead').typeahead({
+  //   hint: true,
+  //   highlight: true,
+  //   autoselect: true,
+  //   minLength: 1
+  // }, {
+  //   name: 'people',
+  //   displayKey: 'value',
+  //   source: substringMatcher(people.allPeople.map(function (person) { return person.name; }))
+  // });
 
   function skipPersonOnEsc (e) {
     if (e.which == KeyCodes.ESC) {
-      processGuess(null);
+      processGuess($, null);
     }
   }
 
@@ -85,8 +89,8 @@ function renderPrevious($el, answerPerson, guessedPerson) {
   $el.toggleClass('failure', !answerPerson.guessedCorrectly);
 }
 
-function addRandomPerson() {
-  addPerson(people.chooseNewPerson());
+function addRandomPerson($) {
+  addPerson($, people.chooseNewPerson());
   $('.answer input').focus();
 }
 
@@ -98,7 +102,7 @@ function partialCredit(guess) {
   return guess.toLowerCase().split(' ')[0] === people.currentPerson().name.toLowerCase().split(' ')[0];
 }
 
-function renderFailures() {
+function renderFailures($) {
   if (game.failures.length === 0) {
     return;
   }
@@ -109,7 +113,7 @@ function renderFailures() {
   }));
 }
 
-function renderScore() {
+function renderScore($) {
   var $el = $('.scores');
   $el.empty();
   $el.append(templates.score({
@@ -122,7 +126,7 @@ function renderScore() {
   }));
 }
 
-function renderSavedPeople() {
+function renderSavedPeople($) {
   storage.retrieve('saved_people', function (savedPeople) {
     var renderData = [];
     for (let name of Object.keys(savedPeople)) {
@@ -152,7 +156,7 @@ function hidePreview($row) {
   $row.find('.hide-preview').addClass('hidden');
 }
 
-function processGuess(guess) {
+function processGuess($, guess) {
   var thisPerson = people.currentPerson();
   Object.assign(thisPerson, {
     guessedCorrectly: false,
@@ -170,13 +174,13 @@ function processGuess(guess) {
   } else {
     game.wrong += 1;
     game.failures.push({name: thisPerson.name, photo: thisPerson.photo});
-    renderFailures();
+    renderFailures($);
   }
 
-  renderScore();
+  renderScore($);
 
   if (people.currentPeople.length > 0) {
-    addRandomPerson();
+    addRandomPerson($);
     if (guess) {
       var guessedPerson = people.personMatching(guess);
       renderPrevious($('#answer'), thisPerson, guessedPerson);
@@ -203,12 +207,12 @@ function clearState () {
   storage.remove('saved_state');
 }
 
-function setGameVisibility(playing, resuming) {
+function setGameVisibility($, playing, resuming) {
   game.playing = playing;
   $('.entry').toggleClass('hidden', playing);
   if (!playing) {
     clearState();
-    renderSavedPeople();
+    renderSavedPeople($);
   }
   $('.game').toggleClass('hidden', !playing);
   $('#question').removeClass('hidden');
@@ -227,23 +231,23 @@ function setGameVisibility(playing, resuming) {
   }
 }
 
-function startGuessing() {
+function startGuessing($) {
   game.resetScore();
 
-  setGameVisibility(true);
+  setGameVisibility($,true, false);
 
   people.currentPeople = people.allPeople.slice(0);
 
-  addRandomPerson();
+  addRandomPerson($);
 
-  renderScore();
+  renderScore($);
 }
 
-function showMainContainer () {
+function showMainContainer ($) {
   $('.game-container').css('visibility', 'visible');
 }
 
-function parseTextarea () {
+function parseTextarea ($) {
   return compact($('.entry textarea').val().split("\n").map(function (line) {
     var match;
     if (match = strip(line).match(/^(http[^ ]+)\s+(.*)/)) {
@@ -255,7 +259,7 @@ function parseTextarea () {
   }));
 }
 
-export default function start (selector) {
+export default function ($, selector) {
   var gameContainer = $(selector);
   gameContainer.html(templates.main());
 
@@ -272,7 +276,7 @@ export default function start (selector) {
     selectedDifficulty: game.difficulty
   }));
 
-  function startGameWithPeople(thesePeople, savedName) {
+  function startGameWithPeople($, thesePeople, savedName) {
     people.allPeople = uniq(thesePeople, function (p) { return p.name; });
     storage.store('people', people.allPeople);
     if (savedName) {
@@ -282,17 +286,17 @@ export default function start (selector) {
       }, {});
     }
 
-    startGuessing();
+    startGuessing($);
   }
 
   gameContainer.find('.begin-button').prop('disabled', true);
   gameContainer.on('input', 'textarea', function (event) {
-    var parsedNames = parseTextarea();
+    var parsedNames = parseTextarea($);
     gameContainer.find('.begin-button').prop('disabled', parsedNames.length === 0);
   });
 
   gameContainer.on('click', '.begin-button', function (event) {
-    startGameWithPeople(parseTextarea(), $('.save-as-name').val());
+    startGameWithPeople($, parseTextarea($), $('.save-as-name').val());
   });
 
   gameContainer.on('change', 'select.difficulty', function () {
@@ -300,12 +304,12 @@ export default function start (selector) {
     storage.store('difficulty', game.difficulty);
 
     if (game.playing) {
-      startGuessing();
+      startGuessing($);
     }
   });
 
   gameContainer.on('click', '.replay button', function (event) {
-    startGuessing();
+    startGuessing($);
   });
 
   gameContainer.on('keydown', function (event) {
@@ -326,7 +330,7 @@ export default function start (selector) {
     var choiceIx = personIndexForKey(event.which);
     if (choiceIx !== undefined) {
       var choicePerson = people.currentPerson().choices[choiceIx];
-      processGuess(choicePerson.name);
+      processGuess($, choicePerson.name);
     }
   });
 
@@ -335,13 +339,13 @@ export default function start (selector) {
       var guess = $(this).val();
       var validPerson = people.personMatching(guess);
       if (game.difficulty.match(/^hard/) || (game.difficulty == 'medium' && validPerson)) {
-        processGuess(guess);
+        processGuess($, guess);
       }
     }
   });
 
   gameContainer.on('click', '[data-link=restart]', function (event) {
-    setGameVisibility(false);
+    setGameVisibility($,false, false);
   });
 
   gameContainer.on('click', '[data-link=restart-mistakes]', function (event) {
@@ -356,22 +360,22 @@ export default function start (selector) {
       now.getHours(),
       now.getMinutes()
     ].map((part) => padStart(part, 2, '0')).join(':');
-    startGameWithPeople(game.failures, 'Mistakes ' + [date, time].join(' '));
+    startGameWithPeople($, game.failures, 'Mistakes ' + [date, time].join(' '));
   });
 
   gameContainer.on('click', 'button.choice', function (event) {
     var guess = $(this).text();
-    processGuess(guess);
+    processGuess($, guess);
   });
 
   gameContainer.on('click', '.choice-images img', function (event) {
     var guess = $(this).data('name');
-    processGuess(guess);
+    processGuess($, guess);
   });
 
   gameContainer.on('click', '.start-with-saved', function (event) {
     storage.retrieve('saved_people', function (savedPeople) {
-      startGameWithPeople(savedPeople[$(event.target).data('name')], $('.save-as-name').val());
+      startGameWithPeople($, savedPeople[$(event.target).data('name')], $('.save-as-name').val());
     });
   });
 
@@ -388,7 +392,7 @@ export default function start (selector) {
       });
 
       storage.store('saved_people', valueToStore);
-      renderSavedPeople();
+      renderSavedPeople($);
     }
   });
 
@@ -420,7 +424,7 @@ export default function start (selector) {
       });
     }
     storage.store('saved_people', valueToStore);
-    renderSavedPeople();
+    renderSavedPeople($);
   });
 
   storage.retrieve('saved_state', function (savedState) {
@@ -431,16 +435,17 @@ export default function start (selector) {
       });
       Object.assign(game, savedState.game);
 
-      setGameVisibility(true, true);
+      setGameVisibility($,true, true);
 
-      addRandomPerson();
+      addRandomPerson($);
 
-      renderFailures();
-      renderScore();
+      renderFailures($);
+      renderScore($);
     } else {
-      renderSavedPeople();
+      renderSavedPeople($);
     }
 
-    showMainContainer();
+    showMainContainer($);
   }, {});
 }
+

@@ -1,6 +1,5 @@
-import {randInt} from './random';
-
-const {map} = _;
+import { randInt } from './random';
+import { map } from 'lodash';
 
 export default {
   currentPersonIndex: null,

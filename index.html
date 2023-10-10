@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <title>Who is?</title>
   <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.css">
-  <link rel="stylesheet" href="assets/who_is.css">
-  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="/src/who_is.css">
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon" />
   <script>
     (function() {
       var onLocalhost = !!window.location.href.match(/^https?:\/\/localhost/);
@@ -22,17 +22,8 @@
 
 <div class="container game-container"></div>
 
-<script src="assets/vendor.js"></script>
-<script src="assets/app.js"></script>
-
-<script>
-  // TODO: find some way for app.js to boot itself
-  require(['who_is'], function (_start) {
-    $('document').ready(function () {
-      _start.default('.game-container');
-    });
-  });
-</script>
+<script type="module" src="/src/who_is.tsx"></script>
+<script type="module" src="/src/boot.tsx"></script>
 
 </body>
 </html>

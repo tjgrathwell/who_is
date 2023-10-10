@@ -2,7 +2,7 @@ git branch -D gh-pages
 
 git checkout -b gh-pages
 
-broccoli build dist
+vite build
 
 git add .
 

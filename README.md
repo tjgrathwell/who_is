@@ -8,11 +8,11 @@ http://tjgrathwell.github.io/who_is
 
 ## Running locally
 
-`broccoli serve`
+`npm run dev`
 
 ## Deployment
 
-`broccoli build dist`
+`npm run build`
 
 ... then copy the generated `dist` directory off to your favorite static site hosting service.
 
@@ -21,16 +21,3 @@ http://tjgrathwell.github.io/who_is
 ### Automatic
 
 `npm test`
-
-### Manual
-
-Start the server with `npm run-script test-server`
-
-Visit `http://localhost:9876/` in your browser.
-
-### Focused
-
-You can run a focused test or group of tests by passing the name on the command line:
-
-`npm run test-server` to start the server
-`npm run test-run -- "who_is shows the app title"`
