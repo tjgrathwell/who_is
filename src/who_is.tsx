@@ -12,6 +12,10 @@ import { includes, compact, uniq, padStart } from 'lodash';
 // TODO: replace typeahead with something that will load in prod mode
 // import 'typeahead.js'
 
+import { createRoot } from "react-dom/client";
+import { StrictMode } from "react";
+import WhoIs from './components/WhoIs.tsx'
+
 function addPerson($, person) {
   var personToRender = addChoices(person);
   renderPerson($('#question'), Object.assign({}, personToRender, game.personRenderOptions()));
@@ -259,9 +263,17 @@ function parseTextarea ($) {
   }));
 }
 
-export default function ($, selector) {
+export default async function ($, selector) {
   var gameContainer = $(selector);
-  gameContainer.html(templates.main());
+
+  const root = createRoot(document.querySelector(selector)!);
+  root.render(
+      <StrictMode>
+        <WhoIs />
+      </StrictMode>,
+  )
+
+  await new Promise(resolve => setTimeout(resolve, 0))
 
   storage.retrieve('difficulty', function (value) {
     game.difficulty = value;

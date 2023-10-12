@@ -5,7 +5,7 @@ import { describe, it, beforeEach, expect } from 'vitest'
 import * as $ from "jquery";
 
 describe('who_is', function() {
-  beforeEach(function (context) {
+  beforeEach(async function (context) {
     storage.clearAll();
 
     const existingContainer = $('body').find('.game-container')
@@ -19,7 +19,7 @@ describe('who_is', function() {
     context.gameContainer.off();
     context.gameContainer.empty();
 
-    start($,'.game-container');
+    await start($,'.game-container');
   });
 
 
@@ -129,23 +129,22 @@ describe('who_is', function() {
       });
 
       describe('in the reverse difficulty', function () {
-        var currentName;
         beforeEach(function (context) {
           context.gameContainer.find('.difficulty').val('reverse').trigger('change');
           context.gameContainer.find('.begin-button').click();
-          currentName = context.gameContainer.find('.person .person-name').text();
+          context.currentName = context.gameContainer.find('.person .person-name').text();
         });
 
         describe('when the correct name is selected', function () {
           it("shows a successful message", function (context) {
-            context.gameContainer.find(`.choice-images img[data-name="${currentName}"]`).click();
+            context.gameContainer.find(`.choice-images img[data-name="${context.currentName}"]`).click();
             expect(context.gameContainer.find('.game .success').length).toEqual(1);
           });
         });
 
         describe('when the wrong name is selected', function () {
           it("shows a failure message", function (context) {
-            context.gameContainer.find('.choice-images [data-name]').filter(`[data-name!="${currentName}"]`).click();
+            context.gameContainer.find('.choice-images [data-name]').filter(`[data-name!="${context.currentName}"]`).click();
             expect(context.gameContainer.find('.game .failure').length).toEqual(1);
           });
         });
