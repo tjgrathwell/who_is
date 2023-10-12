@@ -1,4 +1,6 @@
-function WhoIs() {
+import DifficultySelect from './DifficultySelect'
+
+function WhoIs({selectedDifficulty}) {
     let sampleNames = `http://placebear.com/200/200 A Bear
 https://placekitten.com/200/200 Kitty Cat`;
 
@@ -32,7 +34,9 @@ https://placekitten.com/200/200 Kitty Cat`;
             </div>
 
             <div className="row mb10 mt10">
-                <div className="col-md-6 col-md-offset-3 difficulty-select-container"></div>
+                <div className="col-md-6 col-md-offset-3 difficulty-select-container">
+                    <DifficultySelect selectedDifficulty={selectedDifficulty} />
+                </div>
             </div>
 
             <div className="form-group replay hidden">

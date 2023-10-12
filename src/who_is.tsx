@@ -5,7 +5,6 @@ import substringMatcher from './modules/substring_matcher';
 import {isScrollKey, KeyCodes, personIndexForKey} from './modules/keys';
 import game from './modules/game';
 import people from './modules/people';
-import './modules/monkeypatches';
 import templates from './templates';
 
 import { includes, compact, uniq, padStart } from 'lodash';
@@ -266,27 +265,18 @@ function parseTextarea ($) {
 export default async function ($, selector) {
   var gameContainer = $(selector);
 
-  const root = createRoot(document.querySelector(selector)!);
-  root.render(
-      <StrictMode>
-        <WhoIs />
-      </StrictMode>,
-  )
-
-  await new Promise(resolve => setTimeout(resolve, 0))
-
   storage.retrieve('difficulty', function (value) {
     game.difficulty = value;
   }, 'easy');
 
-  $('.difficulty-select-container').append(templates.difficulty_select({
-    difficulties: [
-      'easy', 'medium', 'hard', 'hardest', 'reverse'
-    ].map((level) => {
-      return {name: level.toTitleCase(), value: level};
-    }),
-    selectedDifficulty: game.difficulty
-  }));
+  const root = createRoot(document.querySelector(selector)!);
+  root.render(
+      <StrictMode>
+        <WhoIs selectedDifficulty={game.difficulty} />
+      </StrictMode>,
+  )
+
+  await new Promise(resolve => setTimeout(resolve, 0))
 
   function startGameWithPeople($, thesePeople, savedName) {
     people.allPeople = uniq(thesePeople, function (p) { return p.name; });

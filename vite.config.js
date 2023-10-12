@@ -1,6 +1,5 @@
 import {defineConfig} from 'vite'
 import Handlebars from 'handlebars';
-import './src/modules/handlebars_helpers';
 
 export default defineConfig({
     base: '',
@@ -13,7 +12,6 @@ export default defineConfig({
                     const precompiled = Handlebars.precompile(source);
                     return `
                         import Handlebars from 'handlebars/runtime.js';
-                        import '/src/modules/handlebars_helpers';
                         const template = Handlebars.template(${precompiled});
                         export default (data, options) => template(data, options);
                     `
