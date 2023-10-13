@@ -1,4 +1,5 @@
 import DifficultySelect from './DifficultySelect'
+import SavedPeople from "./SavedPeople.tsx";
 
 function WhoIs({selectedDifficulty}) {
     let sampleNames = `http://placebear.com/200/200 A Bear
@@ -30,7 +31,9 @@ https://placekitten.com/200/200 Kitty Cat`;
                 <textarea></textarea>
                 <button className="btn btn-primary begin-button">Begin!</button>
                 <input className='form-control save-as-name' placeholder="Save as..." />
-                <div className="saved-people"></div>
+                <div className="saved-people">
+                    <SavedPeople/>
+                </div>
             </div>
 
             <div className="row mb10 mt10">

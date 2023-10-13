@@ -15,6 +15,8 @@ import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 import WhoIs from './components/WhoIs.tsx'
 
+let root;
+
 function addPerson($, person) {
   var personToRender = addChoices(person);
   renderPerson($('#question'), Object.assign({}, personToRender, game.personRenderOptions()));
@@ -129,36 +131,6 @@ function renderScore($) {
   }));
 }
 
-function renderSavedPeople($) {
-  storage.retrieve('saved_people', function (savedPeople) {
-    var renderData = [];
-    for (let name of Object.keys(savedPeople)) {
-      let people = savedPeople[name];
-      var sample = people.slice(0, 3).map(function (person) {
-        return person.name;
-      }).join(', ');
-      renderData.push({name: name, count: people.length, sample: sample});
-    }
-    var $el = $('.saved-people');
-    $el.empty();
-    if (renderData.length > 0) {
-      $el.append(templates.saved_people({savedGroups: renderData}));
-    }
-  }, {});
-}
-
-function renderPreview($row, people) {
-  $row.after('<tr><td colspan=5 class=saved-preview>' + templates.preview_people({people: people}) + '</td></tr>');
-  $row.find('.preview-saved').addClass('hidden');
-  $row.find('.hide-preview').removeClass('hidden');
-}
-
-function hidePreview($row) {
-  $row.next().remove();
-  $row.find('.preview-saved').removeClass('hidden');
-  $row.find('.hide-preview').addClass('hidden');
-}
-
 function processGuess($, guess) {
   var thisPerson = people.currentPerson();
   Object.assign(thisPerson, {
@@ -215,7 +187,7 @@ function setGameVisibility($, playing, resuming) {
   $('.entry').toggleClass('hidden', playing);
   if (!playing) {
     clearState();
-    renderSavedPeople($);
+    renderRootNode(null);
   }
   $('.game').toggleClass('hidden', !playing);
   $('#question').removeClass('hidden');
@@ -262,19 +234,23 @@ function parseTextarea ($) {
   }));
 }
 
-export default async function ($, selector) {
-  var gameContainer = $(selector);
-
-  storage.retrieve('difficulty', function (value) {
-    game.difficulty = value;
-  }, 'easy');
-
-  const root = createRoot(document.querySelector(selector)!);
+function renderRootNode() {
   root.render(
       <StrictMode>
         <WhoIs selectedDifficulty={game.difficulty} />
       </StrictMode>,
   )
+}
+
+export default async function ($, selector) {
+  let gameContainer = $(selector);
+
+  storage.retrieve('difficulty', function (value) {
+    game.difficulty = value;
+  }, 'easy');
+
+  root = createRoot(document.querySelector(selector)!);
+  renderRootNode();
 
   await new Promise(resolve => setTimeout(resolve, 0))
 
@@ -394,21 +370,8 @@ export default async function ($, selector) {
       });
 
       storage.store('saved_people', valueToStore);
-      renderSavedPeople($);
+      renderRootNode(null);
     }
-  });
-
-  gameContainer.on('click', '.preview-saved', function (event) {
-    var name = $(event.target).data('name');
-    if (name) {
-      storage.retrieve('saved_people', function (savedPeople) {
-        renderPreview($(event.target).closest('tr'), savedPeople[name]);
-      });
-    }
-  });
-
-  gameContainer.on('click', '.hide-preview', function (event) {
-    hidePreview($(event.target).closest('tr'));
   });
 
   gameContainer.on('click', '.clear-saved', function (event) {
@@ -426,7 +389,7 @@ export default async function ($, selector) {
       });
     }
     storage.store('saved_people', valueToStore);
-    renderSavedPeople($);
+    renderRootNode(null);
   });
 
   storage.retrieve('saved_state', function (savedState) {
@@ -444,7 +407,7 @@ export default async function ($, selector) {
       renderFailures($);
       renderScore($);
     } else {
-      renderSavedPeople($);
+      renderRootNode(null);
     }
 
     showMainContainer($);

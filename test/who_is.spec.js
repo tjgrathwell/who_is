@@ -1,6 +1,6 @@
 import start from '/src/who_is';
 import storage from '/src/modules/storage';
-import { includes, difference } from 'lodash';
+import { difference } from 'lodash';
 import { describe, it, beforeEach, expect } from 'vitest'
 import * as $ from "jquery";
 
@@ -22,16 +22,11 @@ describe('who_is', function() {
     await start($,'.game-container');
   });
 
-
   it('shows the app title', function (context) {
     expect(context.gameContainer.text()).toMatch('Who is?');
   });
 
   describe('when the user has entered some photo + name combinations', function () {
-    var people;
-    var peopleMap;
-    var images;
-
     beforeEach(function (context) {
       context.people = [
         "http://placebear.com/200/200 A Bear",
@@ -51,7 +46,24 @@ describe('who_is', function() {
     it('starts the game when the start button is pressed', function (context) {
       context.gameContainer.find('.begin-button').click();
       var currentImage = context.gameContainer.find('.person img').attr('src');
-      expect(includes(context.images, currentImage)).toBeTruthy();
+      expect(context.images).to.include(currentImage);
+    });
+
+    it('saves the people for later games', async function (context) {
+      context.gameContainer.find('.save-as-name').val("My Cool List").trigger('input')
+      context.gameContainer.find('.begin-button').click();
+
+      // allow root rerender to take effect
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      context.gameContainer.find('[data-link=restart]').click();
+      expect(context.gameContainer.find('.saved-people').text()).to.include("My Cool List")
+
+      context.gameContainer.find('.saved-people button:contains("Preview")').click();
+
+      // allow setState to take effect
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(context.gameContainer.find('.saved-people').text()).to.include("Hide Preview")
     });
 
     it('shows a randomly shuffled list of options', function (context) {
@@ -121,7 +133,7 @@ describe('who_is', function() {
 
         describe('when the wrong name is selected', function () {
           it("shows a failure message", function (context) {
-            var incorrectName = context.peopleMap[difference(images, [context.currentImage])[0]];
+            var incorrectName = context.peopleMap[difference(context.images, [context.currentImage])[0]];
             context.gameContainer.find('.typeahead').val(incorrectName).trigger(keyEvent('keyup', 13));
             expect(context.gameContainer.find('.game .failure').length).toEqual(1);
           });
